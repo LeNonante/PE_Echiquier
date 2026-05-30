@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Checkmate - Accueil</title>
+
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "outline-variant": "#4e4639",
+                            "secondary-container": "#524343",
+                            "on-primary": "#412d00",
+                            "tertiary-fixed": "#e5e2dd",
+                            "tertiary": "#c9c6c2",
+                            "on-secondary": "#3a2d2d",
+                            "on-surface": "#e5e2e1",
+                            "outline": "#9a8f80",
+                            "primary-fixed": "#ffdea5",
+                            "on-primary-fixed": "#261900",
+                            "surface-dim": "#131313",
+                            "inverse-surface": "#e5e2e1",
+                            "secondary": "#d6c2c1",
+                            "on-secondary-fixed": "#241919",
+                            "surface": "#131313",
+                            "secondary-fixed": "#f3dedd",
+                            "primary-container": "#c5a059",
+                            "surface-container-lowest": "#0e0e0e",
+                            "background": "#131313",
+                            "primary-fixed-dim": "#e9c176",
+                            "tertiary-fixed-dim": "#c9c6c2",
+                            "surface-container": "#20201f",
+                            "secondary-fixed-dim": "#d6c2c1",
+                            "on-error": "#690005",
+                            "error-container": "#93000a",
+                            "error": "#ffb4ab",
+                            "on-error-container": "#ffdad6",
+                            "on-secondary-container": "#c4b1b0",
+                            "surface-container-highest": "#353535",
+                            "on-primary-fixed-variant": "#5d4201",
+                            "surface-bright": "#393939",
+                            "on-secondary-fixed-variant": "#524343",
+                            "inverse-primary": "#775a19",
+                            "on-primary-container": "#4e3700",
+                            "surface-tint": "#e9c176",
+                            "surface-container-high": "#2a2a2a",
+                            "on-tertiary-container": "#3b3b38",
+                            "surface-container-low": "#1c1b1b",
+                            "on-surface-variant": "#d1c5b4",
+                            "on-tertiary": "#31302d",
+                            "tertiary-container": "#a7a5a1",
+                            "on-background": "#e5e2e1",
+                            "surface-variant": "#353535",
+                            "on-tertiary-fixed-variant": "#474743",
+                            "primary": "#e9c176",
+                            "on-tertiary-fixed": "#1c1c19",
+                            "inverse-on-surface": "#313030"
+                        },
+                        borderRadius: {
+                            DEFAULT: "0.125rem",
+                            lg: "0.25rem",
+                            xl: "0.5rem",
+                            full: "0.75rem"
+                        },
+                        spacing: {
+                            unit: "8px",
+                            "component-gap": "16px",
+                            gutter: "24px",
+                            "margin-safe": "32px"
+                        },
+                        fontFamily: {
+                            "headline-md": ["Libre Caslon Text", "serif"],
+                            "body-lg": ["Manrope", "sans-serif"],
+                            "display-lg-mobile": ["Libre Caslon Text", "serif"],
+                            "display-lg": ["Libre Caslon Text", "serif"],
+                            "label-sm": ["Manrope", "sans-serif"],
+                            "body-md": ["Manrope", "sans-serif"]
+                        },
+                        fontSize: {
+                            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "400" }],
+                            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                            "display-lg-mobile": ["32px", { lineHeight: "40px", fontWeight: "400" }],
+                            "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "400" }],
+                            "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.08em", fontWeight: "600" }],
+                            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+                        }
+                    }
+                }
+            }
+        </script>
+    </head>
+    <body class="min-h-screen flex flex-col font-body-md text-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar (Web) -->
+<div class="flex-1 flex flex-col md:flex-row pb-[80px] md:pb-0">
+<!-- SideNavBar (Web) -->
+<!-- Main Content Area -->
+<main class="relative flex-1 w-full max-w-7xl mx-auto px-gutter py-margin-safe flex flex-col justify-center min-h-screen bg-surface-container-lowest"><div class="absolute top-margin-safe right-margin-safe z-10">
+
+</div>
+<div class="md:hidden flex justify-between items-end mb-16">
+<div>
+<h1 class="font-headline-md text-headline-md text-primary mb-1">Bienvenue,</h1>
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-on-surface">Grandmaster</h2>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm bg-surface-container-low px-3 py-1.5 rounded-full border border-outline-variant/20">
+<div class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(233,193,118,0.6)]"></div>
+<span class="">Connecté</span>
+</div>
+</div>
+<div class="hidden md:flex justify-between items-start mb-20">
+<div>
+<h1 class="font-headline-md text-headline-md text-primary mb-2">Bienvenue sur</h1>
+<h2 class="font-display-lg text-display-lg text-on-surface">Chessmate</h2>
+</div>
+<div class="flex flex-col items-end gap-6">
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors duration-300">
+<span class="material-symbols-outlined text-2xl">settings</span>
+</button>
+<div class="flex items-center gap-3 text-on-surface-variant font-label-sm text-label-sm bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant/20 shadow-sm">
+<div class="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_rgba(233,193,118,0.8)] animate-pulse"></div>
+<span class="tracking-widest uppercase">Board Physique connectée</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Options -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-component-gap md:gap-8 max-w-5xl mx-auto w-full">
+<!-- Card 1 -->
+<a class="group relative overflow-hidden rounded-xl bg-[#3C2F2F] p-8 ambient-shadow border border-[#F5F2ED]/10 transition-transform duration-300 hover:-translate-y-1 flex flex-col justify-between min-h-[240px]" href="#">
+<div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&amp;w=600&amp;auto=format&amp;fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-700" data-alt="A close-up view of elegantly carved wooden chess pieces on a beautiful board, illuminated by warm, dramatic lighting that creates deep shadows. The atmosphere is quiet, contemplative, and luxurious, emphasizing the physical texture of the wood and the strategic depth of the game."></div>
+
+<div class="relative z-10 mt-auto">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Observer une partie</h3>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-80 max-w-[80%]">Étudiez les maîtres en action sur le plateau global.</p>
+</div>
+</a>
+<!-- Card 2 -->
+<a class="group relative overflow-hidden rounded-xl bg-[#2D2A26] p-8 ambient-shadow border border-[#F5F2ED]/10 transition-transform duration-300 hover:-translate-y-1 flex flex-col justify-between min-h-[240px]" href="#">
+<div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1586165368502-1bad197a6461?q=80&amp;w=600&amp;auto=format&amp;fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-700" data-alt="A focused view of a sleek, modern chess robot arm positioned over a digital board, suggesting advanced AI capabilities and a high-tech gaming experience."></div>
+
+<div class="relative z-10 mt-auto">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Jouer contre l'IA</h3>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-80 max-w-[80%]">Affinez vos tactiques contre un modèle plus ou moins fort.</p>
+</div>
+</a>
+<!-- Card 3 -->
+<a class="group relative overflow-hidden rounded-xl bg-surface-container p-8 ambient-shadow border border-[#F5F2ED]/10 transition-transform duration-300 hover:-translate-y-1 flex flex-col justify-between min-h-[240px]" href="#">
+<div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1580541832626-2a7131ee809f?q=80&amp;w=600&amp;auto=format&amp;fit=crop')] bg-cover bg-center opacity-10 mix-blend-luminosity group-hover:scale-105 transition-transform duration-700" data-alt="Abstract visualization of a global network connecting digital nodes over a dark, textured background. The scene suggests connectivity, online presence, and sophisticated matchmaking in a premium digital environment. Subtle gold highlights accent the deep charcoal overall tone."></div>
+
+<div class="relative z-10 mt-auto">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Partie en ligne</h3>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-80 max-w-[80%]">Défiez des adversaires de votre niveau mondialement.</p>
+</div>
+</a>
+<!-- Card 4 -->
+<a class="group relative overflow-hidden rounded-xl bg-[#20201f] p-8 ambient-shadow border border-[#F5F2ED]/10 transition-transform duration-300 hover:-translate-y-1 flex flex-col justify-between min-h-[240px]" href="#">
+<div class="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay group-hover:scale-105 transition-transform duration-700" data-alt="Two people engaged in a serious chess match on a high-quality physical board, highlighting the social and tangible aspect of local play." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBwcf-qL3PEEwztJLRuPZka-POUSRgiWn2HTeG9HLDsluY3z8Lc8CKvBNVQRd4OdGygICu-i860F4G5bocgqt8E-wvJ4h9TDhqq442onZ1gRjkYmNKWWBBtnmIEbaAVTK8iL218_jXq1HX1f8RR-GKIw6O161RmhPivgpQkW01_q4HUk3GsZu5N9GYefBAsYHEydmis6-0_DIJzBNpwFRbHzCqxxnvLXu4Si6-SKY7OU7iqr9vovRuh3fJZUd7wfnr6Ip6N2Tsw8qnJ');"></div>
+
+<div class="relative z-10 mt-auto">
+<div class="flex items-center gap-2 mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">Partie locale</h3>
+<span class="w-1.5 h-1.5 rounded-full bg-primary mt-1"></span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-80 max-w-[80%]">Jouez face à face sur le plateau physique.</p>
+</div>
+</a>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-center px-margin-safe pb-4 pt-2 bg-surface-container-lowest/80 backdrop-blur-xl border-t border-outline-variant/10 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] rounded-t-full">
+<!-- Active Tab -->
+<a class="flex flex-col items-center justify-center text-primary font-bold bg-secondary-container/20 rounded-xl px-4 py-1 scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-label-sm text-label-sm">Lobby</span>
+</a>
+<!-- Inactive Tabs -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">psychology</span>
+<span class="font-label-sm text-label-sm">Analyze</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+
+
+
+
+</body></html>
