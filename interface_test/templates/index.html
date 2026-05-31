@@ -128,9 +128,11 @@
                                 <span class="tracking-widest uppercase text-nowrap">Board Physique connectée</span>
                             </div>
                         </div>
-                        <button class="settings-btn">
+                        <a href="{{ url_for('settings') }}">
+                            <button class="settings-btn">
                             <span class="material-symbols-outlined text-2xl">settings</span>
                         </button>
+                        </a>
                     </div>
                 </div>
 
@@ -150,7 +152,7 @@
                     </a>
 
                     <!-- Card 2 : Défier l'IA -->
-                    <a class="bento-card bg-[#2D2A26]" href="#">
+                    <a class="bento-card bg-[#2D2A26]" href="{{ url_for('create_ia') }}">
                         <div class="bento-card-overlay"></div>
                         <div
                             class="card-bg-image card-bg-ai opacity-20 mix-blend-overlay"
@@ -162,7 +164,7 @@
                     </a>
 
                     <!-- Card 3 : Défier un ami en ligne -->
-                    <a class="bento-card bg-surface-container" href="#">
+                    <a class="bento-card bg-surface-container" href="{{ url_for('create_online') }}">
                         <div class="bento-card-overlay"></div>
                         <div
                             class="card-bg-image card-bg-online opacity-10 mix-blend-luminosity"

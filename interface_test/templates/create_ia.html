@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Checkmate - Partie contre l'IA</title>
+
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "outline-variant": "#4e4639",
+                            "secondary-container": "#524343",
+                            "on-primary": "#412d00",
+                            "surface-dim": "#131313",
+                            "inverse-surface": "#e5e2e1",
+                            "secondary": "#d6c2c1",
+                            "surface": "#131313",
+                            "primary-container": "#c5a059",
+                            "surface-container-lowest": "#0e0e0e",
+                            "background": "#131313",
+                            "surface-container": "#20201f",
+                            "error": "#ffb4ab",
+                            "on-surface": "#e5e2e1",
+                            "outline": "#9a8f80",
+                            "surface-container-highest": "#353535",
+                            "surface-bright": "#393939",
+                            "surface-container-high": "#2a2a2a",
+                            "surface-container-low": "#1c1b1b",
+                            "on-surface-variant": "#d1c5b4",
+                            "on-background": "#e5e2e1",
+                            "primary": "#e9c176",
+                            "primary-fixed-dim": "#e9c176",
+                            "on-primary": "#412d00",
+                            "on-primary-container": "#4e3700",
+                            "primary-fixed": "#ffdea5",
+                        },
+                        borderRadius: {
+                            DEFAULT: "0.125rem",
+                            lg: "0.25rem",
+                            xl: "0.5rem",
+                            full: "0.75rem"
+                        },
+                        fontFamily: {
+                            "headline-md": ["Libre Caslon Text", "serif"],
+                            "body-lg": ["Manrope", "sans-serif"],
+                            "display-lg": ["Libre Caslon Text", "serif"],
+                            "label-sm": ["Manrope", "sans-serif"],
+                            "body-md": ["Manrope", "sans-serif"]
+                        },
+                        fontSize: {
+                            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+                        }
+                    }
+                }
+            }
+        </script>
+
+        <style>
+            /* ---------- Labels ---------- */
+            .field-label {
+                font-family: 'Manrope', sans-serif;
+                font-size: 12px;
+                line-height: 16px;
+                letter-spacing: 0.08em;
+                font-weight: 600;
+                color: #d1c5b4;
+                text-transform: uppercase;
+                display: block;
+                margin-bottom: 12px;
+            }
+
+            /* ---------- Slider ---------- */
+            .ai-slider {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 100%;
+                height: 4px;
+                border-radius: 2px;
+                background: linear-gradient(
+                    to right,
+                    #e9c176 0%,
+                    #e9c176 calc((var(--val) - 1) / 7 * 100%),
+                    rgba(78, 70, 57, 0.5) calc((var(--val) - 1) / 7 * 100%),
+                    rgba(78, 70, 57, 0.5) 100%
+                );
+                outline: none;
+                cursor: pointer;
+            }
+
+            .ai-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                background: #e9c176;
+                cursor: pointer;
+                box-shadow: 0 0 0 4px rgba(233, 193, 118, 0.15);
+                transition: box-shadow 0.2s;
+            }
+
+            .ai-slider::-webkit-slider-thumb:hover,
+            .ai-slider:focus::-webkit-slider-thumb {
+                box-shadow: 0 0 0 8px rgba(233, 193, 118, 0.2);
+            }
+
+            .ai-slider::-moz-range-thumb {
+                width: 22px;
+                height: 22px;
+                border: none;
+                border-radius: 50%;
+                background: #e9c176;
+                cursor: pointer;
+            }
+
+            .slider-ticks {
+                display: flex;
+                justify-content: space-between;
+                padding: 0 2px;
+                margin-top: 6px;
+            }
+
+            .slider-tick {
+                font-family: 'Manrope', sans-serif;
+                font-size: 11px;
+                color: #9a8f80;
+                text-align: center;
+                width: 16px;
+                cursor: pointer;
+                transition: color 0.15s;
+            }
+
+            .slider-tick.active {
+                color: #e9c176;
+                font-weight: 600;
+            }
+
+            /* ---------- Color cards ---------- */
+            .color-radio {
+                display: none;
+            }
+
+            .color-card {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+                padding: 20px 12px;
+                border: 1px solid rgba(78, 70, 57, 0.4);
+                border-radius: 0.5rem;
+                background-color: #1c1b1b;
+                cursor: pointer;
+                transition: border-color 0.2s, background-color 0.2s, transform 0.15s;
+                user-select: none;
+            }
+
+            .color-card:hover {
+                border-color: rgba(233, 193, 118, 0.4);
+                background-color: #222120;
+                transform: translateY(-2px);
+            }
+
+            .color-radio:checked + .color-card {
+                border-color: #e9c176;
+                background-color: rgba(233, 193, 118, 0.07);
+                box-shadow: 0 0 0 1px #e9c176 inset;
+            }
+
+            .color-piece {
+                font-size: 48px;
+                line-height: 1;
+            }
+
+            .color-piece--white { color: #f5f0e8; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
+            .color-piece--black { color: #2a2520; -webkit-text-stroke: 1.5px #8a7d6a; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
+            .color-piece--random { color: #d1c5b4; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
+
+            .color-card-label {
+                font-family: 'Manrope', sans-serif;
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                color: #d1c5b4;
+                text-align: center;
+            }
+
+            /* ---------- Number input ---------- */
+            .time-input {
+                width: 100%;
+                background-color: #1c1b1b;
+                border: 1px solid rgba(78, 70, 57, 0.5);
+                border-radius: 0.25rem;
+                padding: 10px 14px;
+                font-family: 'Manrope', sans-serif;
+                font-size: 16px;
+                color: #16100D;
+                outline: none;
+                transition: border-color 0.2s, opacity 0.2s;
+            }
+
+            .time-input:focus { border-color: #e9c176; }
+            .time-input:disabled {
+                opacity: 0.35;
+                cursor: not-allowed;
+            }
+
+            /* ---------- Checkbox ---------- */
+            .custom-checkbox {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+                font-family: 'Manrope', sans-serif;
+                font-size: 13px;
+                color: #9a8f80;
+                user-select: none;
+            }
+
+            .custom-checkbox input[type="checkbox"] {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 16px;
+                height: 16px;
+                border: 1.5px solid rgba(78, 70, 57, 0.7);
+                border-radius: 3px;
+                background: #1c1b1b;
+                cursor: pointer;
+                flex-shrink: 0;
+                transition: background 0.15s, border-color 0.15s;
+                position: relative;
+            }
+
+            .custom-checkbox input[type="checkbox"]:checked {
+                background: #e9c176;
+                border-color: #e9c176;
+            }
+
+            .custom-checkbox input[type="checkbox"]:checked::after {
+                content: '';
+                position: absolute;
+                left: 3px;
+                top: 0px;
+                width: 6px;
+                height: 10px;
+                border: 2px solid #412d00;
+                border-top: none;
+                border-left: none;
+                transform: rotate(45deg);
+            }
+
+            /* ---------- Divider ---------- */
+            .section-divider {
+                border: none;
+                border-top: 1px solid rgba(78, 70, 57, 0.3);
+            }
+
+            /* ---------- Create button ---------- */
+            .btn-create {
+                font-family: 'Manrope', sans-serif;
+                font-size: 14px;
+                letter-spacing: 0.06em;
+                font-weight: 600;
+                text-transform: uppercase;
+                color: #412d00;
+                background-color: #e9c176;
+                border: none;
+                border-radius: 0.25rem;
+                padding: 14px 32px;
+                cursor: pointer;
+                width: 100%;
+                transition: background-color 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .btn-create:hover { background-color: #f0cc87; }
+
+            /* ---------- Back button ---------- */
+            .back-btn {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #d1c5b4;
+                font-family: 'Manrope', sans-serif;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                padding: 8px;
+                border-radius: 0.25rem;
+                transition: color 0.2s, background-color 0.2s;
+            }
+
+            .back-btn:hover {
+                color: #e9c176;
+                background-color: rgba(233, 193, 118, 0.08);
+            }
+        </style>
+    </head>
+
+    <body class="min-h-screen flex flex-col font-body-md text-body-md antialiased">
+
+        <div class="flex-1 flex flex-col">
+            <main class="page-main">
+
+                <!-- Back button -->
+                <div class="absolute top-8 left-6 md:top-margin-safe md:left-gutter">
+                    <a href="{{ url_for('index') }}" class="back-btn">
+                        <span class="material-symbols-outlined text-xl">arrow_back</span>
+                        <span class="hidden sm:inline">Retour</span>
+                    </a>
+                </div>
+
+                <!-- Centered content -->
+                <div class="flex flex-col items-center justify-center flex-1 w-full">
+                    <div class="w-full max-w-lg">
+
+                        <!-- Header -->
+                        <div class="mb-8 text-center">
+                            <h1 class="page-tagline mb-1">Nouvelle partie</h1>
+                            <h2 style="font-family:'Libre Caslon Text',serif;font-size:36px;line-height:44px;font-weight:400;color:#e5e2e1;">
+                                Défiez l'IA
+                            </h2>
+                        </div>
+
+                        <!-- Form card -->
+                        <div style="background-color:#1c1b1b;border:1px solid rgba(245,242,237,0.08);border-radius:0.5rem;padding:2rem;box-shadow:0 4px 16px rgba(0,0,0,0.45),0 1px 4px rgba(0,0,0,0.3);">
+
+                            <!-- ── Section : Niveau de l'IA ── -->
+                            <div class="mb-8">
+                                <div class="flex items-center justify-between mb-3">
+                                    <label class="field-label" style="margin-bottom:0;">Niveau de l'IA</label>
+                                    <span id="level-display" style="font-family:'Libre Caslon Text',serif;font-size:28px;color:#e9c176;min-width:32px;text-align:right;">1</span>
+                                </div>
+
+                                <input
+                                    type="range"
+                                    id="ai-level"
+                                    class="ai-slider"
+                                    min="1" max="8" value="1"
+                                    style="--val:1"
+                                    oninput="updateSlider(this)"
+                                >
+
+                                <div class="slider-ticks">
+                                    <span class="slider-tick active" onclick="setSlider(1)">1</span>
+                                    <span class="slider-tick" onclick="setSlider(2)">2</span>
+                                    <span class="slider-tick" onclick="setSlider(3)">3</span>
+                                    <span class="slider-tick" onclick="setSlider(4)">4</span>
+                                    <span class="slider-tick" onclick="setSlider(5)">5</span>
+                                    <span class="slider-tick" onclick="setSlider(6)">6</span>
+                                    <span class="slider-tick" onclick="setSlider(7)">7</span>
+                                    <span class="slider-tick" onclick="setSlider(8)">8</span>
+                                </div>
+                            </div>
+
+                            <hr class="section-divider mb-8">
+
+                            <!-- ── Section : Couleur ── -->
+                            <div class="mb-8">
+                                <label class="field-label">Votre couleur</label>
+
+                                <div class="flex gap-3">
+                                    <!-- Blanc -->
+                                    <input type="radio" name="color" id="color-white" value="white" class="color-radio" checked>
+                                    <label for="color-white" class="color-card">
+                                        <span class="color-piece color-piece--white">♔</span>
+                                        <span class="color-card-label">Blanc</span>
+                                    </label>
+
+                                    <!-- Noir -->
+                                    <input type="radio" name="color" id="color-black" value="black" class="color-radio">
+                                    <label for="color-black" class="color-card">
+                                        <span class="color-piece color-piece--black">♚</span>
+                                        <span class="color-card-label">Noir</span>
+                                    </label>
+
+                                    <!-- Aléatoire -->
+                                    <input type="radio" name="color" id="color-random" value="random" class="color-radio">
+                                    <label for="color-random" class="color-card">
+                                        <span class="color-piece color-piece--random" style="font-size:40px;display:flex;gap:2px;">
+                                            <span style="color:#f5f0e8;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.6))">♔</span><span style="color:#2a2520;-webkit-text-stroke:1.5px #8a7d6a;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.6))">♚</span>
+                                        </span>
+                                        <span class="color-card-label">Aléatoire</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <hr class="section-divider mb-8">
+
+                            <!-- ── Section : Temps ── -->
+                            <div class="mb-8">
+                                <label class="field-label">Contrôle du temps</label>
+
+                                <div class="flex flex-col gap-5">
+
+                                    <!-- Limite de temps -->
+                                    <div>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span style="font-family:'Manrope',sans-serif;font-size:14px;color:#d1c5b4;">Limite de temps</span>
+                                            <label class="custom-checkbox">
+                                                <input type="checkbox" id="no-time-limit" onchange="toggleTimeInput('time-limit', this)">
+                                                Sans limite
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <input
+                                                type="number"
+                                                id="time-limit"
+                                                class="time-input"
+                                                min="1"
+                                                value="600"
+                                                placeholder="Secondes"
+                                            >
+                                            <span style="font-family:'Manrope',sans-serif;font-size:13px;color:#9a8f80;white-space:nowrap;">sec</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Incrément -->
+                                    <div>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span style="font-family:'Manrope',sans-serif;font-size:14px;color:#d1c5b4;">Incrément par coup</span>
+                                            <label class="custom-checkbox">
+                                                <input type="checkbox" id="no-increment" onchange="toggleTimeInput('increment', this)" checked>
+                                                Sans incrément
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <input
+                                                type="number"
+                                                id="increment"
+                                                class="time-input"
+                                                min="0"
+                                                value="0"
+                                                placeholder="Secondes"
+                                                disabled
+                                            >
+                                            <span style="font-family:'Manrope',sans-serif;font-size:13px;color:#9a8f80;white-space:nowrap;">sec</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <hr class="section-divider mb-8">
+
+                            <!-- ── Bouton créer ── -->
+                            <button type="button" class="btn-create">
+                                <span class="material-symbols-outlined text-xl">play_arrow</span>
+                                Créer la partie
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <script>
+            function updateSlider(input) {
+                const val = parseInt(input.value);
+                input.style.setProperty('--val', val);
+                document.getElementById('level-display').textContent = val;
+
+                document.querySelectorAll('.slider-tick').forEach((tick, i) => {
+                    tick.classList.toggle('active', i + 1 === val);
+                });
+            }
+
+            function setSlider(val) {
+                const slider = document.getElementById('ai-level');
+                slider.value = val;
+                updateSlider(slider);
+            }
+
+            function toggleTimeInput(inputId, checkbox) {
+                const input = document.getElementById(inputId);
+                input.disabled = checkbox.checked;
+            }
+        </script>
+
+    </body>
+</html>
