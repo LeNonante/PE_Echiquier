@@ -15,83 +15,63 @@ couleur_actuelle = None
 
 # --- FONCTIONS D'ÉCOUTE ---
 
-def ecouter_lichess():
-    """Écoute les événements du compte pour détecter le démarrage d'une nouvelle partie."""
-    global game_id_actuel, couleur_actuelle
-
-    print("Écoute du serveur Lichess activée...")
+def attendre_game_start() -> tuple[str, str]:
+    """Écoute les événements du compte jusqu'au démarrage d'une partie, puis retourne (game_id, couleur)."""
+    print("En attente du démarrage de la partie...")
     for event in client.board.stream_incoming_events():
-
         if event['type'] == 'gameStart':
-            game_id_actuel = event['game']['id']
-            couleur_actuelle = "Blancs" if event['game']['color'] == 'white' else "Noirs"
-            print(f"\nLa partie a commencé ! ID : {game_id_actuel}")
-
-            for game_event in client.board.stream_game_state(game_id_actuel):
-                if game_event['type'] == 'gameFull':
-                    print("L'échiquier est en place. Tu joues les {} !".format(couleur_actuelle))
-
-                elif game_event['type'] == 'gameState':
-                    moves = game_event['moves'].split()
-                    if moves:
-                        dernier_coup = moves[-1]
-                        if (len(moves) % 2 == 0 and couleur_actuelle == "Blancs") or \
-                           (len(moves) % 2 != 0 and couleur_actuelle == "Noirs"):
-                            print(f"\nL'adversaire a joué : {dernier_coup}")
-                            print("À toi de jouer : (ex: e2e4, abort, resign) ", end="", flush=True)
-
-                    if game_event.get('status') in ['mate', 'resign', 'draw', 'outoftime']:
-                        print(f"\nFin de la partie. Statut : {game_event['status']}")
-                        game_id_actuel = None
-                        break
+            game_id = event['game']['id']
+            couleur = "Blancs" if event['game']['color'] == 'white' else "Noirs"
+            print(f"\nPartie démarrée ! ID : {game_id}")
+            return game_id, couleur
 
 
-def ecouter_partie_rejointe(game_id):
-    """Écoute directement une partie existante sans passer par stream_incoming_events."""
+def ecouter_partie(game_id: str, couleur: str | None = None):
+    """Écoute l'état d'une partie. Si couleur est None, la détermine depuis gameFull."""
     global game_id_actuel, couleur_actuelle
     game_id_actuel = game_id
-    couleur = None
 
-    for game_event in client.board.stream_game_state(game_id):
-        if game_event['type'] == 'gameFull':
-            me = client.account.get()['id']
-            white_id = game_event['white'].get('id', '')
-            couleur = "Blancs" if white_id == me else "Noirs"
+    for event in client.board.stream_game_state(game_id):
+        if event['type'] == 'gameFull':
+            if couleur is None:
+                me = client.account.get()['id']
+                couleur = "Blancs" if event['white'].get('id', '') == me else "Noirs"
             couleur_actuelle = couleur
-            coups_existants = game_event['state']['moves']
+
+            coups_existants = event['state']['moves']
             if coups_existants:
                 print(f"Historique actuel : {coups_existants}")
-            print("L'échiquier est en place. Tu joues les {} !".format(couleur))
+            print(f"L'échiquier est en place. Tu joues les {couleur} !")
 
-        elif game_event['type'] == 'gameState':
-            if couleur is None:
+        elif event['type'] == 'gameState':
+            if couleur_actuelle is None:
                 continue
-            moves = game_event['moves'].split()
+            moves = event['moves'].split()
             if moves:
                 dernier_coup = moves[-1]
-                if (len(moves) % 2 == 0 and couleur == "Blancs") or \
-                   (len(moves) % 2 != 0 and couleur == "Noirs"):
+                if (len(moves) % 2 == 0 and couleur_actuelle == "Blancs") or \
+                   (len(moves) % 2 != 0 and couleur_actuelle == "Noirs"):
                     print(f"\nL'adversaire a joué : {dernier_coup}")
                     print("À toi de jouer : (ex: e2e4, abort, resign) ", end="", flush=True)
 
-            if game_event.get('status') in ['mate', 'resign', 'draw', 'outoftime']:
-                print(f"\nFin de la partie. Statut : {game_event['status']}")
+            if event.get('status') in ['mate', 'resign', 'draw', 'outoftime']:
+                print(f"\nFin de la partie. Statut : {event['status']}")
                 game_id_actuel = None
                 break
 
 
-# --- MENU (affiché en premier, avant tout thread) ---
+def lancer_ecoute(game_id: str, couleur: str | None = None):
+    """Lance ecouter_partie dans un thread daemon."""
+    thread = threading.Thread(target=ecouter_partie, args=(game_id, couleur), daemon=True)
+    thread.start()
+    time.sleep(0.5)
 
-choix = int(input("1. Jouer contre l'IA\n2. Jouer contre un joueur\n3. Rejoindre une partie déjà commencée\n> "))
 
-if choix == 3:
-    game_id = input("Entrez l'ID de la partie à rejoindre : ")
-    print(f"Connexion à la partie {game_id}...")
-    thread_ecoute = threading.Thread(target=ecouter_partie_rejointe, args=(game_id,), daemon=True)
-    thread_ecoute.start()
-    time.sleep(1)
+# --- MENU ---
 
-elif choix == 1:
+choix = int(input("1. Jouer contre l'IA\n2. Défier un joueur Lichess\n3. Rejoindre une partie déjà commencée\n> "))
+
+if choix == 1:
     print("Lancement du défi contre l'IA Lichess...")
     color = str(input("Choisis ta couleur (black/white/random) : "))
     while color not in ["black", "white", "random"]:
@@ -106,20 +86,45 @@ elif choix == 1:
     if clock_increment == 0:
         clock_increment = None
 
-    # Démarrer l'écoute PUIS créer le défi
-    thread_ecoute = threading.Thread(target=ecouter_lichess, daemon=True)
-    thread_ecoute.start()
-    time.sleep(0.5)
     client.challenges.create_ai(level=1, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
+    game_id, couleur = attendre_game_start()
+    lancer_ecoute(game_id, couleur)
 
 elif choix == 2:
-    print("Mode joueur contre joueur - à implémenter")
-    thread_ecoute = threading.Thread(target=ecouter_lichess, daemon=True)
-    thread_ecoute.start()
-    time.sleep(1)
+    name = input("Entrez le nom d'utilisateur de votre adversaire : ")
+    print(f"Envoi du défi à {name}...")
+    try:
+        rated=str(input("Partie classée ? (y/n) : ")).lower() == "y"
+        
+        color = str(input("Choisis ta couleur (black/white/random) : "))
+        while color not in ["black", "white", "random"]:
+            print("Choix invalide. Essaie encore.")
+            color = str(input("Choisis ta couleur (black/white/random) : "))
+
+        clock_limit = int(input("Limite de temps en secondes (ex: 600 pour 10 min, 0 pour illimité) : "))
+        if clock_limit == 0:
+            clock_limit = None
+
+        clock_increment = int(input("Incrément en secondes (0 pour aucun) : "))
+        if clock_increment == 0:
+            clock_increment = None
+            
+        client.challenges.create(name, rated=rated, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
+        
+    except Exception as e:
+        print(f"Erreur lors de l'envoi du défi : {e}")
+        exit(1)
+    print("Défi envoyé. En attente de l'acceptation...")
+    game_id, couleur = attendre_game_start()
+    lancer_ecoute(game_id, couleur)
+
+elif choix == 3:
+    game_id = input("Entrez l'ID de la partie à rejoindre : ")
+    print(f"Connexion à la partie {game_id}...")
+    lancer_ecoute(game_id)  # couleur déterminée depuis gameFull
 
 
-# --- BOUCLE PRINCIPALE (lit les coups depuis le clavier / futur échiquier physique) ---
+# --- BOUCLE PRINCIPALE ---
 
 while True:
     try:
