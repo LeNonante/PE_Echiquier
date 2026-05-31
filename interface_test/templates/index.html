@@ -113,22 +113,24 @@
 
                 <!-- Desktop Header -->
                 <div class="hidden md:flex justify-between items-start mb-20">
-                    <div>
+                    <div class="ml-20">
                         <h1 class="page-tagline mb-2">Bienvenue sur</h1>
-                        <h2 class="page-title-desktop">Chessmate</h2>
+                        <h2 class="page-title-desktop">Checkmate</h2>
                     </div>
-                    <div class="flex flex-col items-end gap-6">
+                    <div class="flex items-start gap-4">
+                        <div class="flex flex-col gap-2">
+                            <div class="status-badge status-badge--desktop">
+                                <div class="status-dot-success status-dot-success--desktop"></div>
+                                <span class="tracking-widest uppercase text-nowrap">Compte Lichess : USERNAME</span>
+                            </div>
+                            <div class="status-badge status-badge--desktop">
+                                <div class="status-dot-error status-dot-error--desktop"></div>
+                                <span class="tracking-widest uppercase text-nowrap">Board Physique connectée</span>
+                            </div>
+                        </div>
                         <button class="settings-btn">
                             <span class="material-symbols-outlined text-2xl">settings</span>
                         </button>
-                        <div class="status-badge status-badge--desktop">
-                            <div class="status-dot status-dot--desktop"></div>
-                            <span class="tracking-widest uppercase">Board Physique connectée</span>
-                        </div>
-                        <div class="status-badge status-badge--desktop">
-                            <div class="status-dot status-dot--desktop"></div>
-                            <span class="tracking-widest uppercase">Compte Lichess associé : USERNAME / Aucun</span>
-                        </div>
                     </div>
                 </div>
 
@@ -147,27 +149,27 @@
                         </div>
                     </a>
 
-                    <!-- Card 2 : Jouer contre l'IA -->
+                    <!-- Card 2 : Défier l'IA -->
                     <a class="bento-card bg-[#2D2A26]" href="#">
                         <div class="bento-card-overlay"></div>
                         <div
                             class="card-bg-image card-bg-ai opacity-20 mix-blend-overlay"
                         ></div>
                         <div class="card-content">
-                            <h3 class="card-title mb-2">Jouer contre l'IA</h3>
+                            <h3 class="card-title mb-2">Défiez l'IA</h3>
                             <p class="card-description">Affinez vos tactiques contre un modèle plus ou moins fort.</p>
                         </div>
                     </a>
 
-                    <!-- Card 3 : Partie en ligne -->
+                    <!-- Card 3 : Défier un ami en ligne -->
                     <a class="bento-card bg-surface-container" href="#">
                         <div class="bento-card-overlay"></div>
                         <div
                             class="card-bg-image card-bg-online opacity-10 mix-blend-luminosity"
                         ></div>
                         <div class="card-content">
-                            <h3 class="card-title mb-2">Partie en ligne</h3>
-                            <p class="card-description">Défiez des adversaires du monde entier.</p>
+                            <h3 class="card-title mb-2">Défiez un ami en ligne</h3>
+                            <p class="card-description">Défiez des adversaires du monde entier tout en profitant d'un réel plateau de jeu.</p>
                         </div>
                     </a>
 
@@ -178,7 +180,7 @@
                             class="card-bg-image card-bg-local opacity-30 mix-blend-overlay"
                         ></div>
                         <div class="card-content">
-                            <h3 class="card-title">Partie locale</h3>
+                            <h3 class="card-title mb-2">Partie locale</h3>
                             <p class="card-description">Jouez face à face sur le plateau physique.</p>
                         </div>
                     </a>

@@ -72,10 +72,16 @@ def lancer_ecoute(game_id: str, couleur: str | None = None):
 
 # --- MENU ---
 
-choix = int(input("1. Jouer contre l'IA\n2. Défier un joueur Lichess\n3. Rejoindre une partie déjà commencée\n> "))
+choix = int(input("1. Jouer contre l'IA\n2. Défier un joueur Lichess\n3. Rejoindre une partie déjà commencée\n4. Jouez contre un joueur local (voir si faisable)\n> "))
 
 if choix == 1:
     print("Lancement du défi contre l'IA Lichess...")
+    level = int(input("Choisis le niveau de l'IA (1-8) : "))
+    
+    while level < 1 or level > 8:
+        print("Niveau invalide.")
+        level = int(input("Choisis le niveau de l'IA (1-8) : "))
+        
     color = str(input("Choisis ta couleur (black/white/random) : "))
     while color not in ["black", "white", "random"]:
         print("Choix invalide. Essaie encore.")
@@ -89,7 +95,7 @@ if choix == 1:
     if clock_increment == 0:
         clock_increment = None
 
-    client.challenges.create_ai(level=1, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
+    client.challenges.create_ai(level=level, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
     game_id, couleur = attendre_game_start()
     lancer_ecoute(game_id, couleur)
 
@@ -125,6 +131,7 @@ elif choix == 3:
     game_id = input("Entrez l'ID de la partie à rejoindre : ")
     print(f"Connexion à la partie {game_id}...")
     lancer_ecoute(game_id)  # couleur déterminée depuis gameFull
+
 
 
 # --- BOUCLE PRINCIPALE ---
