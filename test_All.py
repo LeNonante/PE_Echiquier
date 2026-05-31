@@ -12,6 +12,9 @@ client = berserk.Client(session=session)
 game_id_actuel = None
 couleur_actuelle = None
 
+username = client.account.get()['username']
+print(f"Connecté à Lichess en tant que {username} !")
+
 
 # --- FONCTIONS D'ÉCOUTE ---
 
