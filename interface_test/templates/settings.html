@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Checkmate - Paramètres</title>
+
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "outline-variant": "#4e4639",
+                            "secondary-container": "#524343",
+                            "on-primary": "#412d00",
+                            "tertiary-fixed": "#e5e2dd",
+                            "tertiary": "#c9c6c2",
+                            "on-secondary": "#3a2d2d",
+                            "on-surface": "#e5e2e1",
+                            "outline": "#9a8f80",
+                            "primary-fixed": "#ffdea5",
+                            "on-primary-fixed": "#261900",
+                            "surface-dim": "#131313",
+                            "inverse-surface": "#e5e2e1",
+                            "secondary": "#d6c2c1",
+                            "on-secondary-fixed": "#241919",
+                            "surface": "#131313",
+                            "secondary-fixed": "#f3dedd",
+                            "primary-container": "#c5a059",
+                            "surface-container-lowest": "#0e0e0e",
+                            "background": "#131313",
+                            "primary-fixed-dim": "#e9c176",
+                            "tertiary-fixed-dim": "#c9c6c2",
+                            "surface-container": "#20201f",
+                            "secondary-fixed-dim": "#d6c2c1",
+                            "on-error": "#690005",
+                            "error-container": "#93000a",
+                            "error": "#ffb4ab",
+                            "on-error-container": "#ffdad6",
+                            "on-secondary-container": "#c4b1b0",
+                            "surface-container-highest": "#353535",
+                            "on-primary-fixed-variant": "#5d4201",
+                            "surface-bright": "#393939",
+                            "on-secondary-fixed-variant": "#524343",
+                            "inverse-primary": "#775a19",
+                            "on-primary-container": "#4e3700",
+                            "surface-tint": "#e9c176",
+                            "surface-container-high": "#2a2a2a",
+                            "on-tertiary-container": "#3b3b38",
+                            "surface-container-low": "#1c1b1b",
+                            "on-surface-variant": "#d1c5b4",
+                            "on-tertiary": "#31302d",
+                            "tertiary-container": "#a7a5a1",
+                            "on-background": "#e5e2e1",
+                            "surface-variant": "#353535",
+                            "on-tertiary-fixed-variant": "#474743",
+                            "primary": "#e9c176",
+                            "on-tertiary-fixed": "#1c1c19",
+                            "inverse-on-surface": "#313030"
+                        },
+                        borderRadius: {
+                            DEFAULT: "0.125rem",
+                            lg: "0.25rem",
+                            xl: "0.5rem",
+                            full: "0.75rem"
+                        },
+                        spacing: {
+                            unit: "8px",
+                            "component-gap": "16px",
+                            gutter: "24px",
+                            "margin-safe": "32px"
+                        },
+                        fontFamily: {
+                            "headline-md": ["Libre Caslon Text", "serif"],
+                            "body-lg": ["Manrope", "sans-serif"],
+                            "display-lg-mobile": ["Libre Caslon Text", "serif"],
+                            "display-lg": ["Libre Caslon Text", "serif"],
+                            "label-sm": ["Manrope", "sans-serif"],
+                            "body-md": ["Manrope", "sans-serif"]
+                        },
+                        fontSize: {
+                            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "400" }],
+                            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                            "display-lg-mobile": ["32px", { lineHeight: "40px", fontWeight: "400" }],
+                            "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "400" }],
+                            "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.08em", fontWeight: "600" }],
+                            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+                        }
+                    }
+                }
+            }
+        </script>
+
+        <style>
+            .settings-field-label {
+                font-family: 'Manrope', sans-serif;
+                font-size: 12px;
+                line-height: 16px;
+                letter-spacing: 0.08em;
+                font-weight: 600;
+                color: #d1c5b4;
+                text-transform: uppercase;
+                margin-bottom: 8px;
+                display: block;
+            }
+
+            .settings-input {
+                width: 100%;
+                background-color: #1c1b1b;
+                border: 1px solid rgba(78, 70, 57, 0.5);
+                border-radius: 0.25rem;
+                padding: 12px 16px;
+                font-family: 'Manrope', sans-serif;
+                font-size: 16px;
+                color: #16100D;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+            .settings-input:focus {
+                border-color: #e9c176;
+            }
+
+            .settings-input::placeholder {
+                color: #9a8f80;
+            }
+
+            .settings-input-wrapper {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+            .settings-input-wrapper .settings-input {
+                padding-right: 48px;
+            }
+
+            .token-toggle-btn {
+                position: absolute;
+                right: 12px;
+                color: #9a8f80;
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 4px;
+                display: flex;
+                align-items: center;
+                border-radius: 0.25rem;
+                transition: color 0.2s;
+            }
+
+            .token-toggle-btn:hover {
+                color: #e9c176;
+            }
+
+            .settings-btn-secondary {
+                font-family: 'Manrope', sans-serif;
+                font-size: 12px;
+                letter-spacing: 0.08em;
+                font-weight: 600;
+                text-transform: uppercase;
+                color: #e9c176;
+                background-color: transparent;
+                border: 1px solid rgba(233, 193, 118, 0.4);
+                border-radius: 0.25rem;
+                padding: 10px 20px;
+                cursor: pointer;
+                white-space: nowrap;
+                transition: background-color 0.2s, border-color 0.2s;
+            }
+
+            .settings-btn-secondary:hover {
+                background-color: rgba(233, 193, 118, 0.08);
+                border-color: rgba(233, 193, 118, 0.7);
+            }
+
+            .settings-btn-primary {
+                font-family: 'Manrope', sans-serif;
+                font-size: 14px;
+                letter-spacing: 0.06em;
+                font-weight: 600;
+                text-transform: uppercase;
+                color: #412d00;
+                background-color: #e9c176;
+                border: none;
+                border-radius: 0.25rem;
+                padding: 14px 32px;
+                cursor: pointer;
+                width: 100%;
+                transition: background-color 0.2s, opacity 0.2s;
+            }
+
+            .settings-btn-primary:hover {
+                background-color: #f0cc87;
+            }
+
+            .back-btn {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #d1c5b4;
+                font-family: 'Manrope', sans-serif;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                padding: 8px;
+                border-radius: 0.25rem;
+                transition: color 0.2s, background-color 0.2s;
+            }
+
+            .back-btn:hover {
+                color: #e9c176;
+                background-color: rgba(233, 193, 118, 0.08);
+            }
+
+            .section-divider {
+                border: none;
+                border-top: 1px solid rgba(78, 70, 57, 0.3);
+                margin: 8px 0;
+            }
+        </style>
+    </head>
+
+    <body class="min-h-screen flex flex-col font-body-md text-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+
+        <div class="flex-1 flex flex-col">
+            <main class="page-main">
+
+                <!-- Back button (top-left) -->
+                <div class="absolute top-8 left-6 md:top-margin-safe md:left-gutter">
+                    <a href="{{ url_for('index') }}" class="back-btn">
+                        <span class="material-symbols-outlined text-xl">arrow_back</span>
+                        <span class="hidden sm:inline">Retour</span>
+                    </a>
+                </div>
+
+                <!-- Centered form -->
+                <div class="flex flex-col items-center justify-center flex-1 w-full">
+                    <div class="w-full max-w-lg">
+
+                        <!-- Header -->
+                        <div class="mb-10 text-center">
+                            <h1 class="page-tagline mb-1">Configuration</h1>
+                            <h2 style="font-family: 'Libre Caslon Text', serif; font-size: 36px; line-height: 44px; font-weight: 400; color: #e5e2e1;">
+                                Paramètres
+                            </h2>
+                        </div>
+
+                        <!-- Form card -->
+                        <div style="background-color: #1c1b1b; border: 1px solid rgba(245, 242, 237, 0.08); border-radius: 0.5rem; padding: 2rem; box-shadow: 0 4px 16px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.3);">
+
+                            <!-- Section : Lichess -->
+                            <div class="mb-8">
+                                <p style="font-family: 'Libre Caslon Text', serif; font-size: 18px; color: #e9c176; margin-bottom: 20px;">
+                                    Lichess
+                                </p>
+
+                                <div>
+                                    <label for="lichess-token" class="settings-field-label">
+                                        Token API
+                                    </label>
+                                    <div class="settings-input-wrapper">
+                                        <input
+                                            type="password"
+                                            id="lichess-token"
+                                            class="settings-input"
+                                            placeholder="lip_xxxxxxxxxxxxxxxxxxxxxxxx"
+                                            autocomplete="off"
+                                        >
+                                        <button
+                                            type="button"
+                                            class="token-toggle-btn"
+                                            id="token-toggle"
+                                            aria-label="Afficher / masquer le token"
+                                            onclick="toggleTokenVisibility()"
+                                        >
+                                            <span class="material-symbols-outlined text-xl" id="token-eye-icon">visibility</span>
+                                        </button>
+                                    </div>
+                                    <p style="font-family: 'Manrope', sans-serif; font-size: 12px; color: #9a8f80; margin-top: 6px;">
+                                        Générez un token sur lichess.org → Préférences → API access tokens.
+                                        <br>Besoin d'aide ? Referez-vous à notre documentation de configuration.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <hr class="section-divider">
+
+                            <!-- Section : Plateau physique -->
+                            <div class="mt-8 mb-8">
+                                <p style="font-family: 'Libre Caslon Text', serif; font-size: 18px; color: #e9c176; margin-bottom: 20px;">
+                                    Plateau physique
+                                </p>
+
+                                <div>
+                                    <label for="board-ip" class="settings-field-label">
+                                        Adresse IP (ou nom d'hôte)
+                                    </label>
+                                    <div class="flex gap-3 items-start">
+                                        <input
+                                            type="text"
+                                            id="board-ip"
+                                            class="settings-input"
+                                            placeholder="checkmate.local"
+                                        >
+                                        <button type="button" class="settings-btn-secondary mt-0">
+                                            Tester
+                                        </button>
+                                    </div>
+                                    <p style="font-family: 'Manrope', sans-serif; font-size: 12px; color: #9a8f80; margin-top: 6px;">
+                                        Adresse IP ou nom mDNS du plateau sur votre réseau local.
+                                        <br>Besoin d'aide ? Referez-vous à notre documentation de configuration.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <hr class="section-divider">
+
+                            <!-- Save button -->
+                            <div class="mt-8">
+                                <button type="button" class="settings-btn-primary">
+                                    Enregistrer les paramètres
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <script>
+            function toggleTokenVisibility() {
+                const input = document.getElementById('lichess-token');
+                const icon  = document.getElementById('token-eye-icon');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.textContent = 'visibility_off';
+                } else {
+                    input.type = 'password';
+                    icon.textContent = 'visibility';
+                }
+            }
+        </script>
+
+    </body>
+</html>
