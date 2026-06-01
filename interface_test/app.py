@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from flaskwebgui import FlaskUI
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 
@@ -21,4 +22,5 @@ def create_online():
     return render_template('create_online.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    FlaskUI(app=app, server="flask", width=1200, height=800).run()
+    #app.run(debug=True)
