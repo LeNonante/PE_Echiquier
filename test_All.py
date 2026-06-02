@@ -12,9 +12,19 @@ client = berserk.Client(session=session)
 game_id_actuel = None
 couleur_actuelle = None
 
+#Affichage du username
 username = client.account.get()['username']
 print(f"Connecté à Lichess en tant que {username} !")
 
+#Affichage des parties en cours
+parties_en_cours = client.games.get_ongoing()
+# Affiche les infos
+for partie in parties_en_cours:
+    print(partie.keys()) #Affiche les clés disponibles pour comprendre la structure de l'objet partie
+    print(f"ID de la partie : {partie['gameId']}")
+    print(f"Adversaire : {partie['opponent']['username']}")
+    print(f"Couleur : {partie['color']}")
+    print("---")
 
 # --- FONCTIONS D'ÉCOUTE ---
 
