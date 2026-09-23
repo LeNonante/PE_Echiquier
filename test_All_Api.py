@@ -12,6 +12,7 @@ client = berserk.Client(session=session)
 game_id_actuel = None
 couleur_actuelle = None
 
+print(client.account.get().keys())  # Affiche les clés disponibles pour comprendre la structure de l'objet compte
 #Affichage du username
 username = client.account.get()['username']
 print(f"Connecté à Lichess en tant que {username} !")
@@ -21,9 +22,14 @@ parties_en_cours = client.games.get_ongoing()
 # Affiche les infos
 for partie in parties_en_cours:
     print(partie.keys()) #Affiche les clés disponibles pour comprendre la structure de l'objet partie
-    print(f"ID de la partie : {partie['gameId']}")
-    print(f"Adversaire : {partie['opponent']['username']}")
-    print(f"Couleur : {partie['color']}")
+    print(f"ID de la partie : {partie['gameId']}") #Id de la partie
+    print(f"Adversaire : {partie['opponent']['username']}") #Adversaire
+    print(f"Couleur : {partie['color']}") #Couleur du joueur
+    print(f"Est-ce mon tour : {partie['isMyTurn']}") #Est-ce le tour du joueur
+    print(f"Dernier coup : {partie['lastMove'] if partie.get('lastMove') else 'N/A'}")
+    print(f"Variante : {partie['variant']['name']}")
+    print(f"Mode de vitesse : {partie['speed']}")# ??
+    print(f"Ai-je joué : {partie['hasMoved']}")
     print("---")
 
 # --- FONCTIONS D'ÉCOUTE ---
@@ -172,3 +178,5 @@ while True:
     except KeyboardInterrupt:
         print("\nArrêt du programme. Si une partie était en cours, tu la perdras au temps sur Lichess.")
         break
+
+# PROBLEME : Après création de partie (contre IA mais peut etre aussi joueur)(), rejoins une partie deja lancée et pas celle crée
