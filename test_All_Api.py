@@ -34,12 +34,20 @@ for partie in parties_en_cours:
 
 # --- FONCTIONS D'ÉCOUTE ---
 
-def attendre_game_start() -> tuple[str, str]:
-    """Écoute les événements du compte jusqu'au démarrage d'une partie, puis retourne (game_id, couleur)."""
+def attendre_game_start(id_attendu: str | None = None) -> tuple[str, str]:
+    """Écoute les événements du compte jusqu'au démarrage d'une partie, puis retourne (game_id, couleur).
+
+    Lichess envoie un événement gameStart pour CHAQUE partie déjà en cours dès l'ouverture
+    du stream (pour permettre aux bots de se reconnecter). Si id_attendu est fourni, on
+    ignore donc tout gameStart qui ne correspond pas à cet id, pour ne pas récupérer par
+    erreur une ancienne partie encore ouverte au lieu de la nouvelle.
+    """
     print("En attente du démarrage de la partie...")
     for event in client.board.stream_incoming_events():
         if event['type'] == 'gameStart':
             game_id = event['game']['id']
+            if id_attendu is not None and game_id != id_attendu:
+                continue
             couleur = "Blancs" if event['game']['color'] == 'white' else "Noirs"
             print(f"\nPartie démarrée ! ID : {game_id}")
             return game_id, couleur
@@ -111,9 +119,10 @@ if choix == 1:
     if clock_increment == 0:
         clock_increment = None
 
-    client.challenges.create_ai(level=level, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
-    game_id, couleur = attendre_game_start()
-    lancer_ecoute(game_id, couleur)
+    partie = client.challenges.create_ai(level=level, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
+    # La partie contre l'IA démarre immédiatement : la réponse contient déjà son id et sa couleur,
+    game_id = partie['id']
+    lancer_ecoute(game_id, None)
 
 elif choix == 2:
     name = input("Entrez le nom d'utilisateur de votre adversaire : ")
@@ -134,13 +143,15 @@ elif choix == 2:
         if clock_increment == 0:
             clock_increment = None
             
-        client.challenges.create(name, rated=rated, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
-        
+        challenge = client.challenges.create(name, rated=rated, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
+
     except Exception as e:
         print(f"Erreur lors de l'envoi du défi : {e}")
         exit(1)
     print("Défi envoyé. En attente de l'acceptation...")
-    game_id, couleur = attendre_game_start()
+    # L'id du challenge devient l'id de la partie une fois acceptée : on l'utilise pour
+    # ignorer les gameStart d'anciennes parties déjà en cours renvoyés par le stream.
+    game_id, couleur = attendre_game_start(id_attendu=challenge['id'])
     lancer_ecoute(game_id, couleur)
 
 elif choix == 3:
@@ -178,5 +189,3 @@ while True:
     except KeyboardInterrupt:
         print("\nArrêt du programme. Si une partie était en cours, tu la perdras au temps sur Lichess.")
         break
-
-# PROBLEME : Après création de partie (contre IA mais peut etre aussi joueur)(), rejoins une partie deja lancée et pas celle crée
