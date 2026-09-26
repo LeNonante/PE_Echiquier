@@ -1,0 +1,11 @@
+<form method="POST" action="{{ url_for('connect_wifi') }}">
+    <label>Réseau :</label>
+    <select name="ssid">
+        {% for ssid in ssids %}
+        <option value="{{ ssid }}">{{ ssid }}</option>
+        {% endfor %}
+    </select>
+    <label>Mot de passe :</label>
+    <input type="password" name="password">
+    <button type="submit">Se connecter</button>
+</form>
