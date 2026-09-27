@@ -158,12 +158,27 @@
             .join-piece--white { color: #f5f0e8; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
             .join-piece--black { color: #8a7d6a; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
 
+            .join-color {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-shrink: 0;
+            }
+
             .join-color-label {
                 font-family: 'Manrope', sans-serif;
                 font-size: 14px;
                 font-weight: 600;
                 color: #e5e2e1;
                 white-space: nowrap;
+            }
+
+            .join-meta {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                flex-wrap: nowrap;
+                min-width: 0;
             }
 
             .join-status {
@@ -199,6 +214,9 @@
                 font-size: 13px;
                 color: #9a8f80;
                 white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                min-width: 0;
             }
 
             .join-btn {
@@ -233,6 +251,20 @@
                 .join-row {
                     flex-direction: column;
                     align-items: stretch;
+                }
+                .join-meta {
+                    justify-content: space-between;
+                    gap: 8px;
+                    width: 100%;
+                }
+                .join-color-label,
+                .join-status,
+                .join-lastmove {
+                    font-size: 12px;
+                }
+                .join-lastmove {
+                    flex: 1 1 auto;
+                    text-align: right;
                 }
                 .join-btn {
                     margin-left: 0;
@@ -298,15 +330,19 @@
                                 <div class="join-row">
                                     <span class="join-id-badge">ID {{ game.id }}</span>
 
-                                    <span class="material-symbols-outlined join-piece join-piece--{{ game.color }}">chess</span>
-                                    <span class="join-color-label">{{ 'Blanc' if game.color == 'white' else 'Noir' }}</span>
+                                    <div class="join-meta">
+                                        <span class="join-color">
+                                            <span class="material-symbols-outlined join-piece join-piece--{{ game.color }}">chess</span>
+                                            <span class="join-color-label">{{ 'Blanc' if game.color == 'white' else 'Noir' }}</span>
+                                        </span>
 
-                                    <span class="join-status">
-                                        <span class="join-dot join-dot--{{ 'you' if game.turn == 'you' else 'waiting' }}"></span>
-                                        {{ 'À vous' if game.turn == 'you' else 'Attente' }}
-                                    </span>
+                                        <span class="join-status">
+                                            <span class="join-dot join-dot--{{ 'you' if game.turn == 'you' else 'waiting' }}"></span>
+                                            {{ 'À vous' if game.turn == 'you' else 'Attente' }}
+                                        </span>
 
-                                    <span class="join-lastmove">dernier coup&nbsp;: {{ game.last_move }}</span>
+                                        <span class="join-lastmove">dernier coup&nbsp;: {{ game.last_move }}</span>
+                                    </div>
 
                                     <a href="{{ game.url if game.url is defined else '#' }}" class="join-btn">Rejoindre</a>
                                 </div>
