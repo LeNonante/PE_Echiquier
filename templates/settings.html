@@ -303,6 +303,15 @@
                             </div>
 
                         </form>
+
+                        {% if is_connected %}
+                        <form method="post" action="{{ url_for('logout') }}" class="mt-4">
+                            <button type="submit" class="settings-btn-secondary w-full flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-xl">logout</span>
+                                Se déconnecter
+                            </button>
+                        </form>
+                        {% endif %}
                     </div>
                 </div>
 

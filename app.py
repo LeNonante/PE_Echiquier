@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from assets.lichess_api_functions import *
 from assets.gestion_env import *
 from datetime import datetime
@@ -46,17 +46,18 @@ def index():
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     context = {}
-    if isThereATokenApiLichess():
-        context["token"] = getTokenApiLichess()
-    else :
-        context["token"] = ""
-    
     if request.method == "POST":
         token = request.form.get("token")
         setTokenApiLichess(token)
-        context["token"] = token
         print(f"Token API Lichess enregistré : {token}")
+    context["token"] = getTokenApiLichess() if isThereATokenApiLichess() else ""
+    context["is_connected"] = bool(context["token"])
     return render_template('settings.html', **context)
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    setTokenApiLichess("")
+    return redirect(url_for('index'))
 
 @app.route('/create_ia')
 def create_ia():
