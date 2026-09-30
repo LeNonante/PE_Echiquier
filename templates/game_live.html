@@ -332,6 +332,7 @@
             let hasClock = false;
             let lastSyncAt = Date.now();
             let sideToMove = "white";
+            let clockRunning = false;
             let gameOver = false;
             let tickHandle = null;
 
@@ -346,6 +347,10 @@
             function updateSideToMove(moves) {
                 const played = moves ? moves.trim().split(/\s+/).filter(Boolean) : [];
                 sideToMove = played.length % 2 === 0 ? "white" : "black";
+                // Sur Lichess, le premier coup de chaque camp est "gratuit" : l'horloge ne
+                // démarre vraiment qu'à partir du 2e coup de chaque joueur (donc une fois que
+                // les deux camps ont déjà joué au moins un coup).
+                clockRunning = played.length >= 2;
 
                 let lastWhite = "—";
                 let lastBlack = "—";
@@ -367,7 +372,10 @@
             function startTicking() {
                 if (tickHandle) clearInterval(tickHandle);
                 tickHandle = setInterval(() => {
-                    if (gameOver || !hasClock) return;
+                    if (gameOver || !hasClock || !clockRunning) {
+                        lastSyncAt = Date.now();
+                        return;
+                    }
                     const elapsed = Date.now() - lastSyncAt;
                     lastSyncAt = Date.now();
                     if (sideToMove === "white" && wtimeMs !== null) {
