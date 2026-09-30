@@ -254,7 +254,7 @@
                         </div>
 
                         <!-- Form card -->
-                        <div style="background-color: #1c1b1b; border: 1px solid rgba(245, 242, 237, 0.08); border-radius: 0.5rem; padding: 2rem; box-shadow: 0 4px 16px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.3);">
+                        <form method="post" action="{{ url_for('settings') }}" style="background-color: #1c1b1b; border: 1px solid rgba(245, 242, 237, 0.08); border-radius: 0.5rem; padding: 2rem; box-shadow: 0 4px 16px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.3);">
 
                             <!-- Section : Lichess -->
                             <div class="mb-8">
@@ -270,9 +270,11 @@
                                         <input
                                             type="password"
                                             id="lichess-token"
+                                            name="token"
                                             class="settings-input"
                                             placeholder="lip_xxxxxxxxxxxxxxxxxxxxxxxx"
                                             autocomplete="off"
+                                            value="{{ token }}"
                                         >
                                         <button
                                             type="button"
@@ -295,12 +297,12 @@
 
                             <!-- Save button -->
                             <div class="mt-8">
-                                <button type="button" class="settings-btn-primary">
+                                <button type="submit" class="settings-btn-primary">
                                     Enregistrer les paramètres
                                 </button>
                             </div>
 
-                        </div>
+                        </form>
                     </div>
                 </div>
 

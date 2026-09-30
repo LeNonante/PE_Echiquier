@@ -1,6 +1,4 @@
 from flask import Flask, render_template, request
-from assets.lichess_api_functions import *
-from assets.gestion_env import *
 from datetime import datetime
 
 app = Flask(__name__)
@@ -31,32 +29,11 @@ def connect_wifi():
 
 @app.route('/')
 def index():
-    context = {"username": "Déconnecté", "is_connected": False}
-    if isThereATokenApiLichess():
-        try:
-            token = getTokenApiLichess()
-            client = connect_to_lichess(token)
-            account_info = get_account_info(client)
-            context["username"] = account_info["username"]
-            context["is_connected"] = True
-        except Exception:
-            pass
-    return render_template('index.html', **context)
+    return render_template('index.html')
 
-@app.route('/settings', methods=['GET', 'POST'])
+@app.route('/settings')
 def settings():
-    context = {}
-    if isThereATokenApiLichess():
-        context["token"] = getTokenApiLichess()
-    else :
-        context["token"] = ""
-    
-    if request.method == "POST":
-        token = request.form.get("token")
-        setTokenApiLichess(token)
-        context["token"] = token
-        print(f"Token API Lichess enregistré : {token}")
-    return render_template('settings.html', **context)
+    return render_template('settings.html')
 
 @app.route('/create_ia')
 def create_ia():
