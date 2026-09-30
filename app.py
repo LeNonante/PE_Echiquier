@@ -99,6 +99,30 @@ def create_ia():
 def create_online():
     if get_client() is None:
         return redirect(url_for('settings'))
+    elif request.method == 'POST':
+        adversaire = request.form.get('adversaire', '').strip()
+        color = request.form.get('color')
+        clock_limit = request.form.get('clock_limit')
+        clock_increment = request.form.get('clock_increment')
+        no_clock_limit = request.form.get('no_clock_limit')
+        no_clock_increment = request.form.get('no_clock_increment')
+        if not adversaire:
+            return render_template('create_online.html', error="Veuillez indiquer le pseudo Lichess de l'adversaire.")
+        if no_clock_limit is not None:
+            # Lichess exige limite et incrément ensemble : pas de limite => pas d'horloge
+            clock_limit = None
+            clock_increment = None
+        else:
+            clock_limit = int(clock_limit)
+            clock_increment = 0 if no_clock_increment is not None else int(clock_increment)
+            if clock_limit not in (15, 30, 45) and (clock_limit <= 0 or clock_limit % 60 != 0):
+                return render_template('create_online.html', error="Limite de temps invalide : Veuillez choisir 15, 30, 45s ou un multiple de 60s.")
+        try:
+            challenge = creer_partie_contre_joueur(get_client(), adversaire, rated=False, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
+        except Exception:
+            return render_template('create_online.html', error=f"Impossible de défier « {adversaire} ». Vérifiez que ce pseudo existe et qu'il accepte les défis.")
+        print(challenge['id'])
+        return render_template('create_online.html')
     else :
         return render_template('create_online.html')
 
