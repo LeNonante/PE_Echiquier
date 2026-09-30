@@ -107,12 +107,8 @@ def rejoindre():
     if get_client() is None:
         return redirect(url_for('settings'))
     else:
-        games = [
-            {'id': 4821, 'color': 'white', 'turn': 'you', 'last_move': 'e4'},
-            {'id': 4822, 'color': 'black', 'turn': 'waiting', 'last_move': 'Nf3'},
-            {'id': 4823, 'color': 'white', 'turn': 'you', 'last_move': 'd4'},
-            {'id': 4824, 'color': 'black', 'turn': 'you', 'last_move': 'c5'},
-        ]
+        games = get_all_ongoing_games(get_client())
+        print(games)
         return render_template('rejoindre.html', games=games)
 
 init_client_from_env()  # connexion au lancement si un token est déjà enregistré
