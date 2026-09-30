@@ -132,7 +132,6 @@ def rejoindre():
         return redirect(url_for('settings'))
     else:
         games = get_all_ongoing_games(get_client())
-        print(games)
         return render_template('rejoindre.html', games=games)
 
 init_client_from_env()  # connexion au lancement si un token est déjà enregistré
