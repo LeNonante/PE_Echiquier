@@ -10,12 +10,10 @@ app = Flask(__name__)
 
 import subprocess
 
+
 @app.route('/wifi_setup')
 def wifi_setup():
-    result = subprocess.run(["nmcli", "-t", "-f", "SSID", "device", "wifi", "list"],
-                             capture_output=True, text=True)
-    ssids = sorted(set(s for s in result.stdout.split('\n') if s.strip()))
-    return render_template('wifi_setup.html', ssids=ssids)
+    return render_template('wifi_setup.html')
 
 @app.route('/connect_wifi', methods=['POST'])
 def connect_wifi():

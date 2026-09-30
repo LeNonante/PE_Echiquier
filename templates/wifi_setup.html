@@ -1,11 +1,223 @@
-<form method="POST" action="{{ url_for('connect_wifi') }}">
-    <label>Réseau :</label>
-    <select name="ssid">
-        {% for ssid in ssids %}
-        <option value="{{ ssid }}">{{ ssid }}</option>
-        {% endfor %}
-    </select>
-    <label>Mot de passe :</label>
-    <input type="password" name="password">
-    <button type="submit">Se connecter</button>
-</form>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.A.E.L. — Configuration Wi-Fi</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg:        #131313;
+        --card:      #1c1b1b;
+        --gold:      #e9c176;
+        --gold-dark: #412d00;
+        --text:      #e5e2e1;
+        --muted:     #9a8f80;
+        --label:     #d1c5b4;
+        --line:      rgba(78, 70, 57, 0.5);
+        --error:     #ffb4ab;
+        --success:   #a6d68a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: 'Manrope', sans-serif;
+        font-size: 16px;
+        line-height: 24px;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .wrapper { width: 100%; max-width: 480px; }
+
+    .header { text-align: center; margin-bottom: 32px; }
+
+    .tagline {
+        font-size: 12px;
+        line-height: 16px;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin: 0 0 4px;
+    }
+
+    .title {
+        font-family: 'Libre Caslon Text', serif;
+        font-size: 36px;
+        line-height: 44px;
+        font-weight: 400;
+        margin: 0;
+    }
+
+    .card {
+        background-color: var(--card);
+        border: 1px solid rgba(245, 242, 237, 0.08);
+        border-radius: 8px;
+        padding: 32px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    .field { margin-bottom: 24px; }
+
+    .field-label {
+        display: block;
+        font-size: 12px;
+        line-height: 16px;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--label);
+        margin-bottom: 10px;
+    }
+
+    select, input[type="text"], input[type="password"] {
+        width: 100%;
+        background-color: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 12px 14px;
+        font-family: inherit;
+        font-size: 16px;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    select:focus, input:focus { border-color: var(--gold); }
+    input::placeholder { color: var(--muted); }
+
+    .row { display: flex; gap: 10px; align-items: stretch; }
+    .row select { flex: 1; }
+
+    .icon-btn {
+        flex-shrink: 0;
+        width: 48px;
+        background: transparent;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        color: var(--label);
+        font-size: 18px;
+        cursor: pointer;
+        transition: border-color 0.2s, color 0.2s;
+    }
+
+    .icon-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .icon-btn.spinning { animation: spin 0.9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--muted);
+        cursor: pointer;
+        user-select: none;
+        margin-top: 12px;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 15px 32px;
+        background-color: var(--gold);
+        color: var(--gold-dark);
+        border: none;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background-color 0.2s, opacity 0.2s;
+    }
+
+    .btn:hover:not(:disabled) { background-color: #f0cc87; }
+    .btn:disabled { opacity: 0.5; cursor: wait; }
+
+    .message {
+        margin-top: 20px;
+        padding: 14px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+        line-height: 20px;
+        display: none;
+    }
+
+    .message.visible { display: block; }
+    .message.error   { background: rgba(255, 180, 171, 0.10); color: var(--error);   border: 1px solid rgba(255, 180, 171, 0.3); }
+    .message.success { background: rgba(166, 214, 138, 0.10); color: var(--success); border: 1px solid rgba(166, 214, 138, 0.3); }
+
+    .hint {
+        margin-top: 20px;
+        font-size: 12px;
+        line-height: 18px;
+        color: var(--muted);
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <div class="header">
+        <p class="tagline">Première mise en service</p>
+        <h1 class="title">Connexion Wi-Fi</h1>
+    </div>
+
+    <div class="card">
+
+        <div class="field">
+            <label class="field-label" for="ssid">Votre réseau</label>
+            <div class="row">
+                <select id="ssid">
+                    <option value="">Choisissez un réseau…</option>
+                    <option>Freebox-A1B2C3   ●●●</option>
+                    <option>Bbox-XYZ   ●●○</option>
+                    <option>iPhone de Paul   ●○○</option>
+                </select>
+                <button type="button" class="icon-btn" id="rescan" title="Rechercher à nouveau">&#8635;</button>
+            </div>
+            <label class="checkbox">
+                <input type="checkbox" id="hidden-network"> Mon réseau n'apparaît pas dans la liste
+            </label>
+        </div>
+
+        <div class="field" id="hidden-field" style="display:none;">
+            <label class="field-label" for="hidden-ssid">Nom du réseau</label>
+            <input type="text" id="hidden-ssid" placeholder="Nom exact du réseau" autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="field">
+            <label class="field-label" for="password">Mot de passe</label>
+            <input type="password" id="password" placeholder="Mot de passe du Wi-Fi" autocomplete="off">
+            <label class="checkbox">
+                <input type="checkbox" id="show-password"> Afficher le mot de passe
+            </label>
+        </div>
+
+        <button type="button" class="btn" id="connect">Connecter l'échiquier</button>
+
+        <div class="message" id="message"></div>
+
+    </div>
+
+    <p class="hint">
+        Le mot de passe est enregistré uniquement sur l'échiquier.<br>
+        Vous pourrez débrancher le câble une fois la connexion établie.
+    </p>
+
+</div>
+
+</body>
+</html>
