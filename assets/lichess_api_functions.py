@@ -88,3 +88,64 @@ def creer_partie_contre_joueur(client, opponent_username, rated, color, clock_li
     """
     challenge = client.challenges.create(opponent_username, rated=rated, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
     return challenge
+
+def _info_joueur(joueur):
+    """
+    Normalise les infos d'un camp (blancs ou noirs) envoyées par Lichess dans un évènement
+    'gameFull' : un adversaire IA n'a pas de nom, seulement un niveau ('aiLevel').
+    """
+    if 'aiLevel' in joueur:
+        return {"name": f"Stockfish niveau {joueur['aiLevel']}", "is_ai": True, "rating": None}
+    return {"name": joueur.get('name') or joueur.get('id') or '?', "is_ai": False, "rating": joueur.get('rating')}
+
+def stream_partie_events(client, game_id):
+    """
+    Écoute le flux d'état d'une partie Lichess (client.board.stream_game_state) et le
+    transforme en évènements simples, sérialisables en JSON, pour alimenter une page de suivi
+    en direct (via Server-Sent Events par exemple) : un premier évènement 'full' avec toutes les
+    infos de la partie, puis un évènement 'state' à chaque coup joué ou changement de statut.
+
+    Args:
+        client: Instance du client Lichess.
+        game_id (str): ID de la partie à suivre.
+
+    Yields:
+        dict: Évènement normalisé décrivant l'état courant de la partie.
+    """
+    for event in client.board.stream_game_state(game_id):
+        etype = event.get('type')
+        if etype == 'gameFull':
+            state = event.get('state', {})
+            clock = event.get('clock')
+            yield {
+                "type": "full",
+                "white": _info_joueur(event.get('white', {})),
+                "black": _info_joueur(event.get('black', {})),
+                "speed": event.get('speed'),
+                "clock_initial_ms": clock.get('initial') if clock else None,
+                "clock_increment_ms": clock.get('increment') if clock else None,
+                "moves": state.get('moves', ''),
+                "wtime_ms": state.get('wtime'),
+                "btime_ms": state.get('btime'),
+                "status": state.get('status'),
+                "winner": state.get('winner'),
+            }
+        elif etype == 'gameState':
+            wtime = event.get('wtime')
+            btime = event.get('btime')
+            yield {
+                "type": "state",
+                "moves": event.get('moves', ''),
+                "wtime_ms": int(wtime.total_seconds() * 1000) if wtime is not None else None,
+                "btime_ms": int(btime.total_seconds() * 1000) if btime is not None else None,
+                "status": event.get('status'),
+                "winner": event.get('winner'),
+            }
+
+def _info_joueur_export(joueur):
+    """Même rôle que _info_joueur, mais pour le format renvoyé par client.games.export()
+    (utilisé en repli quand le flux temps réel n'est plus disponible)."""
+    if 'aiLevel' in joueur:
+        return {"name": f"Stockfish niveau {joueur['aiLevel']}", "is_ai": True, "rating": None}
+    user = joueur.get('user', {})
+    return {"name": user.get('name') or user.get('id') or '?', "is_ai": False, "rating": joueur.get('rating')}

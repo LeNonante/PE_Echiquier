@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Response
 from assets.lichess_api_functions import *
 from assets.gestion_env import *
 from assets.gestion_client import *
 from datetime import datetime
+import json
 
 app = Flask(__name__)
 
@@ -91,7 +92,7 @@ def create_ia():
 
         partie = creer_partie_ia(get_client(), level, color, clock_limit, clock_increment)
         game_id = partie['id']
-        return render_template('create_ia.html')
+        return redirect(url_for('suivi_partie', game_id=game_id))
     else :
         return render_template('create_ia.html')
 
@@ -134,7 +135,35 @@ def rejoindre():
         games = get_all_ongoing_games(get_client())
         return render_template('rejoindre.html', games=games)
 
+@app.route('/partie/<game_id>')
+def suivi_partie(game_id):
+    if get_client() is None:
+        return redirect(url_for('settings'))
+    return render_template('game_live.html', game_id=game_id)
+
+@app.route('/partie/<game_id>/stream')
+def suivi_partie_stream(game_id):
+    client = get_client()
+    if client is None:
+        return redirect(url_for('settings'))
+
+    def event_stream():
+        try:
+            for event in stream_partie_events(client, game_id):
+                yield f"data: {json.dumps(event)}\n\n"
+            return
+        except Exception as e:
+            print(f"[suivi_partie] flux temps réel interrompu pour la partie {game_id} : {e}")
+
+    return Response(
+        event_stream(),
+        mimetype='text/event-stream',
+        headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'},
+    )
+
 init_client_from_env()  # connexion au lancement si un token est déjà enregistré
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80, debug=True)
+    # threaded=True : indispensable pour que le flux SSE de suivi de partie (connexion
+    # longue durée) ne bloque pas les autres requêtes sur le serveur de développement.
+    app.run(host='0.0.0.0', port=80, debug=True, threaded=True)

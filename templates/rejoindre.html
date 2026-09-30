@@ -390,7 +390,7 @@
                                             <span class="join-opponent-label">Adversaire&nbsp;:</span>
                                             <span class="join-opponent-name">{{ (game.opponent.username if game.source == 'friend' else None) or ('Stockfish niveau ' ~ game.opponent.ai if game.source == 'ai' else None) }}</span>
                                         </span>
-                                        <a href="#" class="join-btn">Rejoindre</a>
+                                        <a href="{{ url_for('suivi_partie', game_id=game.gameId) }}" class="join-btn">Rejoindre</a>
                                     </div>
                                 </div>
                                 {% endfor %}

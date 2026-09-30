@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>M.A.E.L. - Partie en cours</title>
+
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "outline-variant": "#4e4639",
+                            "secondary-container": "#524343",
+                            "on-primary": "#412d00",
+                            "surface-dim": "#131313",
+                            "inverse-surface": "#e5e2e1",
+                            "secondary": "#d6c2c1",
+                            "surface": "#131313",
+                            "primary-container": "#c5a059",
+                            "surface-container-lowest": "#0e0e0e",
+                            "background": "#131313",
+                            "surface-container": "#20201f",
+                            "error": "#ffb4ab",
+                            "on-surface": "#e5e2e1",
+                            "outline": "#9a8f80",
+                            "surface-container-highest": "#353535",
+                            "surface-bright": "#393939",
+                            "surface-container-high": "#2a2a2a",
+                            "surface-container-low": "#1c1b1b",
+                            "on-surface-variant": "#d1c5b4",
+                            "on-background": "#e5e2e1",
+                            "primary": "#e9c176",
+                            "primary-fixed-dim": "#e9c176",
+                            "on-primary-container": "#4e3700",
+                            "primary-fixed": "#ffdea5",
+                        },
+                        borderRadius: {
+                            DEFAULT: "0.125rem",
+                            lg: "0.25rem",
+                            xl: "0.5rem",
+                            full: "0.75rem"
+                        },
+                        fontFamily: {
+                            "headline-md": ["Libre Caslon Text", "serif"],
+                            "body-lg": ["Manrope", "sans-serif"],
+                            "display-lg": ["Libre Caslon Text", "serif"],
+                            "label-sm": ["Manrope", "sans-serif"],
+                            "body-md": ["Manrope", "sans-serif"]
+                        }
+                    }
+                }
+            }
+        </script>
+
+        <style>
+            /* ---------- Back button ---------- */
+            .back-btn {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #d1c5b4;
+                font-family: 'Manrope', sans-serif;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                padding: 8px;
+                border-radius: 0.25rem;
+                transition: color 0.2s, background-color 0.2s;
+            }
+
+            .back-btn:hover {
+                color: #e9c176;
+                background-color: rgba(233, 193, 118, 0.08);
+            }
+
+            /* ---------- Info bar ---------- */
+            .info-bar {
+                background-color: #1c1b1b;
+                border: 1px solid rgba(245, 242, 237, 0.08);
+                border-radius: 0.5rem;
+                padding: 16px 20px;
+                margin-bottom: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .info-bar-id {
+                font-family: 'Manrope', sans-serif;
+                font-size: 12px;
+                letter-spacing: 0.06em;
+                color: #9a8f80;
+                text-transform: uppercase;
+            }
+
+            .info-bar-mode {
+                font-family: 'Manrope', sans-serif;
+                font-size: 16px;
+                font-weight: 600;
+                color: #e5e2e1;
+            }
+
+            /* ---------- Player cards ---------- */
+            .players-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+
+            @media (max-width: 560px) {
+                .players-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .player-card {
+                background-color: #1c1b1b;
+                border: 1px solid rgba(78, 70, 57, 0.4);
+                border-radius: 0.5rem;
+                padding: 24px;
+                transition: border-color 0.2s, box-shadow 0.2s;
+            }
+
+            .player-card.active-turn {
+                border-color: #e9c176;
+                box-shadow: 0 0 0 1px #e9c176 inset;
+            }
+
+            .player-piece {
+                font-size: 32px;
+                line-height: 1;
+                margin-bottom: 12px;
+                display: block;
+            }
+
+            .player-piece--white { color: #f5f0e8; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
+            .player-piece--black { color: #8a7d6a; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
+
+            .player-name {
+                font-family: 'Manrope', sans-serif;
+                font-size: 18px;
+                font-weight: 700;
+                color: #e5e2e1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .player-color-label {
+                font-family: 'Manrope', sans-serif;
+                font-size: 13px;
+                color: #9a8f80;
+                margin-bottom: 20px;
+            }
+
+            .player-stats {
+                display: flex;
+                align-items: flex-end;
+                gap: 28px;
+            }
+
+            .player-stat-value {
+                font-family: 'Libre Caslon Text', serif;
+                font-size: 30px;
+                color: #e5e2e1;
+                font-variant-numeric: tabular-nums;
+            }
+
+            .player-card.active-turn .player-stat-value.clock {
+                color: #e9c176;
+            }
+
+            .player-stat-value.moves {
+                font-family: 'Manrope', sans-serif;
+                font-size: 15px;
+                font-weight: 600;
+                letter-spacing: 0.02em;
+            }
+
+            .player-stat-label {
+                font-family: 'Manrope', sans-serif;
+                font-size: 11px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: #9a8f80;
+                margin-top: 4px;
+            }
+
+            /* ---------- Status banner ---------- */
+            .status-banner {
+                margin-top: 24px;
+                text-align: center;
+                font-family: 'Manrope', sans-serif;
+                font-size: 15px;
+                font-weight: 600;
+                color: #e9c176;
+                background-color: rgba(233, 193, 118, 0.08);
+                border: 1px solid rgba(233, 193, 118, 0.3);
+                border-radius: 0.25rem;
+                padding: 14px;
+            }
+        </style>
+    </head>
+
+    <body class="min-h-screen flex flex-col font-body-md text-body-md antialiased">
+
+        <div class="flex-1 flex flex-col">
+            <main class="page-main">
+
+                <!-- Back button -->
+                <div class="absolute top-8 left-6 md:top-margin-safe md:left-gutter">
+                    <a href="{{ url_for('rejoindre') }}" class="back-btn">
+                        <span class="material-symbols-outlined text-xl">arrow_back</span>
+                        <span class="hidden sm:inline">Retour</span>
+                    </a>
+                </div>
+
+                <div class="flex flex-col items-center justify-center flex-1 w-full">
+                    <div class="w-full max-w-2xl">
+
+                        <!-- Header -->
+                        <div class="mb-8 text-center">
+                            <h1 class="page-tagline mb-1">Partie en cours</h1>
+                            <h2 style="font-family:'Libre Caslon Text',serif;font-size:36px;line-height:44px;font-weight:400;color:#e5e2e1;">
+                                Suivi des joueurs et du temps restant
+                            </h2>
+                        </div>
+
+                        <!-- Info bar -->
+                        <div class="info-bar">
+                            <span class="info-bar-id">ID de partie&nbsp;: #{{ game_id }}</span>
+                            <span class="info-bar-mode" id="mode-label">Connexion au flux Lichess…</span>
+                        </div>
+
+                        <!-- Player cards -->
+                        <div class="players-grid">
+                            <div class="player-card" id="card-white">
+                                <span class="material-symbols-outlined player-piece player-piece--white">chess</span>
+                                <div class="player-name" id="name-white">—</div>
+                                <div class="player-color-label">Blancs</div>
+                                <div class="player-stats">
+                                    <div>
+                                        <div class="player-stat-value clock" id="clock-white">--:--</div>
+                                        <div class="player-stat-label">Restant</div>
+                                    </div>
+                                    <div>
+                                        <div class="player-stat-value moves" id="lastmove-white">—</div>
+                                        <div class="player-stat-label">Dernier coup</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="player-card" id="card-black">
+                                <span class="material-symbols-outlined player-piece player-piece--black">chess</span>
+                                <div class="player-name" id="name-black">—</div>
+                                <div class="player-color-label">Noirs</div>
+                                <div class="player-stats">
+                                    <div>
+                                        <div class="player-stat-value clock" id="clock-black">--:--</div>
+                                        <div class="player-stat-label">Restant</div>
+                                    </div>
+                                    <div>
+                                        <div class="player-stat-value moves" id="lastmove-black">—</div>
+                                        <div class="player-stat-label">Dernier coup</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status banner (fin de partie) -->
+                        <div class="status-banner" id="status-banner" hidden></div>
+
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <script>
+            const gameId = {{ game_id | tojson }};
+
+            const SPEED_LABELS = {
+                ultraBullet: "Ultra-bullet",
+                bullet: "Bullet",
+                blitz: "Blitz",
+                rapid: "Rapide",
+                classical: "Classique",
+                correspondence: "Correspondance",
+            };
+
+            const STATUS_LABELS = {
+                mate: "Échec et mat.",
+                resign: "Partie terminée par abandon.",
+                stalemate: "Pat : partie nulle.",
+                timeout: "Partie terminée : un joueur a quitté la partie.",
+                outoftime: "Partie terminée au temps.",
+                draw: "Partie nulle.",
+                aborted: "Partie annulée.",
+                cheat: "Partie annulée pour triche détectée.",
+                noStart: "Partie annulée : un joueur n'a pas commencé.",
+                unknownFinish: "Partie terminée.",
+                variantEnd: "Partie terminée.",
+            };
+
+            const ONGOING_STATUSES = new Set(["created", "started"]);
+
+            const els = {
+                mode: document.getElementById("mode-label"),
+                banner: document.getElementById("status-banner"),
+                cardWhite: document.getElementById("card-white"),
+                cardBlack: document.getElementById("card-black"),
+                nameWhite: document.getElementById("name-white"),
+                nameBlack: document.getElementById("name-black"),
+                clockWhite: document.getElementById("clock-white"),
+                clockBlack: document.getElementById("clock-black"),
+                lastMoveWhite: document.getElementById("lastmove-white"),
+                lastMoveBlack: document.getElementById("lastmove-black"),
+            };
+
+            let wtimeMs = null;
+            let btimeMs = null;
+            let hasClock = false;
+            let lastSyncAt = Date.now();
+            let sideToMove = "white";
+            let gameOver = false;
+            let tickHandle = null;
+
+            function formatClock(ms) {
+                if (ms === null || !hasClock) return "∞";
+                const totalSeconds = Math.max(0, Math.round(ms / 1000));
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                return `${minutes}:${String(seconds).padStart(2, "0")}`;
+            }
+
+            function updateSideToMove(moves) {
+                const played = moves ? moves.trim().split(/\s+/).filter(Boolean) : [];
+                sideToMove = played.length % 2 === 0 ? "white" : "black";
+
+                let lastWhite = "—";
+                let lastBlack = "—";
+                played.forEach((move, i) => {
+                    if (i % 2 === 0) lastWhite = move; else lastBlack = move;
+                });
+                els.lastMoveWhite.textContent = lastWhite;
+                els.lastMoveBlack.textContent = lastBlack;
+
+                els.cardWhite.classList.toggle("active-turn", !gameOver && sideToMove === "white");
+                els.cardBlack.classList.toggle("active-turn", !gameOver && sideToMove === "black");
+            }
+
+            function renderClocks() {
+                els.clockWhite.textContent = formatClock(wtimeMs);
+                els.clockBlack.textContent = formatClock(btimeMs);
+            }
+
+            function startTicking() {
+                if (tickHandle) clearInterval(tickHandle);
+                tickHandle = setInterval(() => {
+                    if (gameOver || !hasClock) return;
+                    const elapsed = Date.now() - lastSyncAt;
+                    lastSyncAt = Date.now();
+                    if (sideToMove === "white" && wtimeMs !== null) {
+                        wtimeMs = Math.max(0, wtimeMs - elapsed);
+                    } else if (sideToMove === "black" && btimeMs !== null) {
+                        btimeMs = Math.max(0, btimeMs - elapsed);
+                    }
+                    renderClocks();
+                }, 250);
+            }
+
+            function endGame(status, winner) {
+                gameOver = true;
+                if (tickHandle) clearInterval(tickHandle);
+                els.cardWhite.classList.remove("active-turn");
+                els.cardBlack.classList.remove("active-turn");
+
+                let message = STATUS_LABELS[status] || "Partie terminée.";
+                if (winner === "white") message += " Victoire des Blancs.";
+                if (winner === "black") message += " Victoire des Noirs.";
+                els.banner.textContent = message;
+                els.banner.hidden = false;
+            }
+
+            function applyFull(data) {
+                els.nameWhite.textContent = data.white.name;
+                els.nameBlack.textContent = data.black.name;
+
+                hasClock = data.clock_initial_ms !== null && data.clock_initial_ms !== undefined;
+                const speedLabel = SPEED_LABELS[data.speed] || data.speed || "";
+                const minutes = hasClock ? Math.round(data.clock_initial_ms / 60000) : null;
+                els.mode.textContent = hasClock
+                    ? `Mode de jeu ${speedLabel} • ${minutes} min par joueur`
+                    : `Mode de jeu ${speedLabel} • sans limite de temps`;
+
+                wtimeMs = data.wtime_ms;
+                btimeMs = data.btime_ms;
+                lastSyncAt = Date.now();
+                updateSideToMove(data.moves);
+                renderClocks();
+
+                if (ONGOING_STATUSES.has(data.status)) {
+                    startTicking();
+                } else {
+                    endGame(data.status, data.winner);
+                }
+            }
+
+            function applyState(data) {
+                wtimeMs = data.wtime_ms;
+                btimeMs = data.btime_ms;
+                lastSyncAt = Date.now();
+                updateSideToMove(data.moves);
+                renderClocks();
+
+                if (!ONGOING_STATUSES.has(data.status)) {
+                    endGame(data.status, data.winner);
+                }
+            }
+
+            const source = new EventSource(`/partie/${gameId}/stream`);
+
+            source.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === "full") {
+                    applyFull(data);
+                } else if (data.type === "state") {
+                    applyState(data);
+                } else if (data.type === "error") {
+                    els.mode.textContent = data.message
+                        ? `Connexion au flux Lichess perdue : ${data.message}`
+                        : "Connexion au flux Lichess perdue.";
+                    gameOver = true;
+                    if (tickHandle) clearInterval(tickHandle);
+                }
+
+                if (gameOver) {
+                    source.close();
+                }
+            };
+
+            source.onerror = () => {
+                if (gameOver) {
+                    source.close();
+                }
+            };
+        </script>
+
+    </body>
+</html>
