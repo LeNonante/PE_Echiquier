@@ -289,6 +289,25 @@
 
             .btn-create:hover { background-color: #f0cc87; }
 
+            /* ---------- Notification ---------- */
+            .settings-notif {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 16px;
+                padding: 12px 16px;
+                border-radius: 0.25rem;
+                font-family: 'Manrope', sans-serif;
+                font-size: 14px;
+                transition: opacity 0.4s;
+            }
+
+            .settings-notif-error {
+                color: #ffdad6;
+                background-color: rgba(147, 0, 10, 0.35);
+                border: 1px solid rgba(255, 180, 171, 0.5);
+            }
+
             /* ---------- Back button ---------- */
             .back-btn {
                 display: flex;
@@ -336,8 +355,16 @@
                             </h2>
                         </div>
 
+                        <!-- Notification d'erreur -->
+                        {% if error %}
+                        <div id="settings-notif" role="alert" class="settings-notif settings-notif-error">
+                            <span class="material-symbols-outlined text-xl">error</span>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endif %}
+
                         <!-- Form card -->
-                        <div style="background-color:#1c1b1b;border:1px solid rgba(245,242,237,0.08);border-radius:0.5rem;padding:2rem;box-shadow:0 4px 16px rgba(0,0,0,0.45),0 1px 4px rgba(0,0,0,0.3);">
+                        <form method="post" action="{{ url_for('create_ia') }}" onsubmit="prepareForm()" style="background-color:#1c1b1b;border:1px solid rgba(245,242,237,0.08);border-radius:0.5rem;padding:2rem;box-shadow:0 4px 16px rgba(0,0,0,0.45),0 1px 4px rgba(0,0,0,0.3);">
 
                             <!-- ── Section : Niveau de l'IA ── -->
                             <div class="mb-8">
@@ -349,6 +376,7 @@
                                 <input
                                     type="range"
                                     id="ai-level"
+                                    name="level"
                                     class="ai-slider"
                                     min="1" max="8" value="1"
                                     style="--val:1"
@@ -416,7 +444,7 @@
                                         <div class="flex items-center justify-between mb-2">
                                             <span style="font-family:'Manrope',sans-serif;font-size:14px;color:#d1c5b4;">Limite de temps</span>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" id="no-time-limit" onchange="toggleTimeInput('time-limit', this)">
+                                                <input type="checkbox" id="no-time-limit" name="no_clock_limit" onchange="toggleTimeInput('time-limit', this)">
                                                 Sans limite
                                             </label>
                                         </div>
@@ -424,6 +452,7 @@
                                             <input
                                                 type="number"
                                                 id="time-limit"
+                                                    name="clock_limit"
                                                 class="time-input"
                                                 min="1"
                                                 value="600"
@@ -438,7 +467,7 @@
                                         <div class="flex items-center justify-between mb-2">
                                             <span style="font-family:'Manrope',sans-serif;font-size:14px;color:#d1c5b4;">Incrément par coup</span>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" id="no-increment" onchange="toggleTimeInput('increment', this)" checked>
+                                                <input type="checkbox" id="no-increment" name="no_clock_increment" onchange="toggleTimeInput('increment', this)" checked>
                                                 Sans incrément
                                             </label>
                                         </div>
@@ -446,6 +475,7 @@
                                             <input
                                                 type="number"
                                                 id="increment"
+                                                    name="clock_increment"
                                                 class="time-input"
                                                 min="0"
                                                 value="0"
@@ -462,12 +492,12 @@
                             <hr class="section-divider mb-8">
 
                             <!-- ── Bouton créer ── -->
-                            <button type="button" class="btn-create">
+                            <button type="submit" class="btn-create">
                                 <span class="material-symbols-outlined text-xl">play_arrow</span>
                                 Créer la partie
                             </button>
 
-                        </div>
+                        </form>
                     </div>
                 </div>
 
@@ -475,6 +505,14 @@
         </div>
 
         <script>
+            const notif = document.getElementById('settings-notif');
+            if (notif) {
+                setTimeout(() => {
+                    notif.style.opacity = '0';
+                    setTimeout(() => notif.remove(), 400);
+                }, 5000);
+            }
+
             function updateSlider(input) {
                 const val = parseInt(input.value);
                 input.style.setProperty('--val', val);
@@ -494,6 +532,21 @@
             function toggleTimeInput(inputId, checkbox) {
                 const input = document.getElementById(inputId);
                 input.disabled = checkbox.checked;
+            }
+
+            function prepareForm() {
+                const timeLimit = document.getElementById('time-limit');
+                const increment = document.getElementById('increment');
+
+                if (document.getElementById('no-time-limit').checked) {
+                    timeLimit.value = '0';
+                    timeLimit.disabled = false;
+                }
+
+                if (document.getElementById('no-increment').checked) {
+                    increment.value = '0';
+                    increment.disabled = false;
+                }
             }
         </script>
 

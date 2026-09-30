@@ -1,4 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
+from assets.lichess_api_functions import *
+from assets.gestion_env import *
+from assets.gestion_client import *
 from datetime import datetime
 
 app = Flask(__name__)
@@ -29,29 +32,110 @@ def connect_wifi():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    context = {"username": "Déconnecté", "is_connected": False}
+    client = get_client()
+    if client is not None:
+        try:
+            account_info = get_account_info(client)
+            context["username"] = account_info["username"]
+            context["is_connected"] = True
+        except Exception:
+            pass
+    return render_template('index.html', **context)
 
-@app.route('/settings')
+@app.route('/settings', methods=['GET', 'POST'])
 def settings():
-    return render_template('settings.html')
+    context = {}
+    if request.method == "POST":
+        token = request.form.get("token")
+        try:
+            init_client(token)  # valide le token et crée le client global
+        except Exception:
+            context["error"] = "Token invalide. Veuillez réessayer."
+            context["token"] = getTokenApiLichess() if isThereATokenApiLichess() else ""
+            context["is_connected"] = bool(context["token"])
+            return render_template('settings.html', **context)
 
-@app.route('/create_ia')
+        setTokenApiLichess(token)
+        context["success"] = "Token API Lichess enregistré avec succès."
+    context["token"] = getTokenApiLichess() if isThereATokenApiLichess() else ""
+    context["is_connected"] = bool(context["token"])
+    return render_template('settings.html', **context)
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    setTokenApiLichess("")
+    reset_client()
+    return redirect(url_for('index'))
+
+@app.route('/create_ia', methods=['GET', 'POST'])
 def create_ia():
-    return render_template('create_ia.html')
+    if get_client() is None:
+        return redirect(url_for('settings'))
+    elif request.method == 'POST':
+        level = int(request.form.get('level'))
+        color = request.form.get('color')
+        clock_limit = request.form.get('clock_limit')
+        clock_increment = request.form.get('clock_increment')
+        no_clock_limit = request.form.get('no_clock_limit')
+        no_clock_increment = request.form.get('no_clock_increment')
+        if no_clock_limit is not None:
+            # Lichess exige limite et incrément ensemble : pas de limite => pas d'horloge
+            clock_limit = None
+            clock_increment = None
+        else:
+            clock_limit = int(clock_limit)
+            clock_increment = 0 if no_clock_increment is not None else int(clock_increment)
+            if clock_limit not in (15, 30, 45) and (clock_limit <= 0 or clock_limit % 60 != 0):
+                return render_template('create_ia.html', error="Limite de temps invalide : Veuillez choisir 15, 30, 45s ou un multiple de 60s.")
 
-@app.route('/create_online')
+        partie = creer_partie_ia(get_client(), level, color, clock_limit, clock_increment)
+        game_id = partie['id']
+        return render_template('create_ia.html')
+    else :
+        return render_template('create_ia.html')
+
+@app.route('/create_online', methods=['GET', 'POST'])
 def create_online():
-    return render_template('create_online.html')
+    if get_client() is None:
+        return redirect(url_for('settings'))
+    elif request.method == 'POST':
+        adversaire = request.form.get('adversaire', '').strip()
+        color = request.form.get('color')
+        clock_limit = request.form.get('clock_limit')
+        clock_increment = request.form.get('clock_increment')
+        no_clock_limit = request.form.get('no_clock_limit')
+        no_clock_increment = request.form.get('no_clock_increment')
+        if not adversaire:
+            return render_template('create_online.html', error="Veuillez indiquer le pseudo Lichess de l'adversaire.")
+        if no_clock_limit is not None:
+            # Lichess exige limite et incrément ensemble : pas de limite => pas d'horloge
+            clock_limit = None
+            clock_increment = None
+        else:
+            clock_limit = int(clock_limit)
+            clock_increment = 0 if no_clock_increment is not None else int(clock_increment)
+            if clock_limit not in (15, 30, 45) and (clock_limit <= 0 or clock_limit % 60 != 0):
+                return render_template('create_online.html', error="Limite de temps invalide : Veuillez choisir 15, 30, 45s ou un multiple de 60s.")
+        try:
+            challenge = creer_partie_contre_joueur(get_client(), adversaire, rated=False, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
+        except Exception:
+            return render_template('create_online.html', error=f"Impossible de défier « {adversaire} ». Vérifiez que ce pseudo existe et qu'il accepte les défis.")
+        print(challenge['id'])
+        return render_template('create_online.html')
+    else :
+        return render_template('create_online.html')
 
-@app.route('/rejoindre')
+@app.route('/rejoindre', methods=['GET', 'POST'])
 def rejoindre():
-    games = [
-        {'id': 4821, 'color': 'white', 'turn': 'you', 'last_move': 'e4'},
-        {'id': 4822, 'color': 'black', 'turn': 'waiting', 'last_move': 'Nf3'},
-        {'id': 4823, 'color': 'white', 'turn': 'you', 'last_move': 'd4'},
-        {'id': 4824, 'color': 'black', 'turn': 'you', 'last_move': 'c5'},
-    ]
-    return render_template('rejoindre.html', games=games)
+    if get_client() is None:
+        return redirect(url_for('settings'))
+    else:
+        games = get_all_ongoing_games(get_client())
+        print(games)
+        return render_template('rejoindre.html', games=games)
+
+init_client_from_env()  # connexion au lancement si un token est déjà enregistré
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)

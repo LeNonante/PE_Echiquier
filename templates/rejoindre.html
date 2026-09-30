@@ -239,6 +239,42 @@
 
             .join-btn:hover { background-color: #f0cc87; }
 
+            .join-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                width: 100%;
+            }
+
+            .join-opponent {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-width: 0;
+                font-family: 'Manrope', sans-serif;
+                font-size: 13px;
+            }
+
+            .join-opponent-icon {
+                font-size: 18px;
+                color: #9a8f80;
+                flex-shrink: 0;
+            }
+
+            .join-opponent-label {
+                color: #9a8f80;
+                white-space: nowrap;
+            }
+
+            .join-opponent-name {
+                color: #e5e2e1;
+                font-weight: 600;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
             .join-empty {
                 font-family: 'Manrope', sans-serif;
                 font-size: 14px;
@@ -265,6 +301,10 @@
                 .join-lastmove {
                     flex: 1 1 auto;
                     text-align: right;
+                }
+                .join-footer {
+                    flex-direction: column;
+                    align-items: stretch;
                 }
                 .join-btn {
                     margin-left: 0;
@@ -328,7 +368,7 @@
                             <div class="join-list">
                                 {% for game in games %}
                                 <div class="join-row">
-                                    <span class="join-id-badge">ID {{ game.id }}</span>
+                                    <span class="join-id-badge">ID {{ game.gameId }}</span>
 
                                     <div class="join-meta">
                                         <span class="join-color">
@@ -337,14 +377,21 @@
                                         </span>
 
                                         <span class="join-status">
-                                            <span class="join-dot join-dot--{{ 'you' if game.turn == 'you' else 'waiting' }}"></span>
-                                            {{ 'À vous' if game.turn == 'you' else 'Attente' }}
+                                            <span class="join-dot join-dot--{{ 'you' if game.isMyTurn else 'waiting' }}"></span>
+                                            {{ 'À vous' if game.isMyTurn else 'Attente' }}
                                         </span>
 
-                                        <span class="join-lastmove">dernier coup&nbsp;: {{ game.last_move }}</span>
+                                        <span class="join-lastmove">dernier coup&nbsp;: {{ game.lastMove }}</span>
                                     </div>
 
-                                    <a href="{{ game.url if game.url is defined else '#' }}" class="join-btn">Rejoindre</a>
+                                    <div class="join-footer">
+                                        <span class="join-opponent">
+                                            <span class="material-symbols-outlined join-opponent-icon">person</span>
+                                            <span class="join-opponent-label">Adversaire&nbsp;:</span>
+                                            <span class="join-opponent-name">{{ (game.opponent.username if game.source == 'friend' else None) or ('Stockfish niveau ' ~ game.opponent.ai if game.source == 'ai' else None) }}</span>
+                                        </span>
+                                        <a href="#" class="join-btn">Rejoindre</a>
+                                    </div>
                                 </div>
                                 {% endfor %}
                             </div>

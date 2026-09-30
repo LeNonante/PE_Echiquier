@@ -122,8 +122,8 @@
                         </a>
                     </div>
                     <div class="status-badge status-badge--desktop self-start">
-                        <div class="status-dot-success status-dot-success--desktop"></div>
-                        <span class="tracking-widest uppercase text-nowrap">Compte Lichess : USERNAME</span>
+                        <div class="status-dot-{{ 'success' if is_connected else 'error' }} status-dot-{{ 'success' if is_connected else 'error' }}--desktop"></div>
+                        <span class="tracking-widest uppercase text-nowrap">Compte Lichess : {{ username }}</span>
                     </div>
                 </div>
 
@@ -136,8 +136,8 @@
                     <div class="flex items-start gap-4">
                         <div class="flex flex-col gap-2">
                             <div class="status-badge status-badge--desktop">
-                                <div class="status-dot-success status-dot-success--desktop"></div>
-                                <span class="tracking-widest uppercase text-nowrap">Compte Lichess : USERNAME</span>
+                                <div class="status-dot-{{ 'success' if is_connected else 'error' }} status-dot-{{ 'success' if is_connected else 'error' }}--desktop"></div>
+                                <span class="tracking-widest uppercase text-nowrap">Compte Lichess : {{ username }}</span>
                             </div>
                         </div>
                         <a href="{{ url_for('settings') }}">
@@ -194,7 +194,7 @@
                             class="card-bg-image card-bg-local opacity-30 mix-blend-overlay"
                         ></div>
                         <div class="card-content">
-                            <h3 class="card-title mb-2">Partie de démonstration</h3>
+                            <h3 class="card-title mb-2">Lancer une démonstration</h3>
                             <p class="card-description">Laissez l'échiquier jouer seul, par exemple pour l'utiliser comme décoration. <br>Ce mode est également accessible depuis le plateau physique (voir documentation).</p>
                         </div>
                     </a>
