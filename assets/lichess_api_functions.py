@@ -13,10 +13,17 @@ def connect_to_lichess(token):
 
     Returns:
         berserk.Client: Instance du client Lichess connecté.
+
+    Raises:
+        berserk.exceptions.ResponseError: Si le token est invalide (401).
     """
-    
+
     session = berserk.TokenSession(token)
     client = berserk.Client(session=session)
+    try:
+        client.account.get()  # Lève une erreur si le token n'est pas valide
+    except berserk.exceptions.ResponseError as e:
+        raise e
     return client
 
 def get_account_info(client):

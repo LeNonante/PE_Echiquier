@@ -48,8 +48,15 @@ def settings():
     context = {}
     if request.method == "POST":
         token = request.form.get("token")
+        try:
+            client = connect_to_lichess(token)
+        except Exception:
+            context["error"] = "Token invalide. Veuillez réessayer."
+            return render_template('settings.html', **context)
+        
         setTokenApiLichess(token)
-        print(f"Token API Lichess enregistré : {token}")
+        #print(f"Token API Lichess enregistré : {token}")
+        context["success"] = "Token API Lichess enregistré avec succès."
     context["token"] = getTokenApiLichess() if isThereATokenApiLichess() else ""
     context["is_connected"] = bool(context["token"])
     return render_template('settings.html', **context)
