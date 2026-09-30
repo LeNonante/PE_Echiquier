@@ -57,7 +57,6 @@ def settings():
             return render_template('settings.html', **context)
 
         setTokenApiLichess(token)
-        #print(f"Token API Lichess enregistré : {token}")
         context["success"] = "Token API Lichess enregistré avec succès."
     context["token"] = getTokenApiLichess() if isThereATokenApiLichess() else ""
     context["is_connected"] = bool(context["token"])
@@ -69,25 +68,45 @@ def logout():
     reset_client()
     return redirect(url_for('index'))
 
-@app.route('/create_ia')
+@app.route('/create_ia', methods=['GET', 'POST'])
 def create_ia():
     if get_client() is None:
         return redirect(url_for('settings'))
+    elif request.method == 'POST':
+        level = int(request.form.get('level'))
+        color = request.form.get('color')
+        clock_limit = request.form.get('clock_limit')
+        clock_increment = request.form.get('clock_increment')
+        no_clock_limit = request.form.get('no_clock_limit')
+        no_clock_increment = request.form.get('no_clock_increment')
+        if no_clock_limit is not None:
+            # Lichess exige limite et incrément ensemble : pas de limite => pas d'horloge
+            clock_limit = None
+            clock_increment = None
+        else:
+            clock_limit = int(clock_limit)
+            clock_increment = 0 if no_clock_increment is not None else int(clock_increment)
+            if clock_limit not in (15, 30, 45) and (clock_limit <= 0 or clock_limit % 60 != 0):
+                return render_template('create_ia.html', error="Limite de temps invalide : Veuillez choisir 15, 30, 45s ou un multiple de 60s.")
+
+        partie = creer_partie_ia(get_client(), level, color, clock_limit, clock_increment)
+        game_id = partie['id']
+        return render_template('create_ia.html')
     else :
         return render_template('create_ia.html')
 
-@app.route('/create_online')
+@app.route('/create_online', methods=['GET', 'POST'])
 def create_online():
     if get_client() is None:
         return redirect(url_for('settings'))
     else :
         return render_template('create_online.html')
 
-@app.route('/rejoindre')
+@app.route('/rejoindre', methods=['GET', 'POST'])
 def rejoindre():
     if get_client() is None:
         return redirect(url_for('settings'))
-    else :
+    else:
         games = [
             {'id': 4821, 'color': 'white', 'turn': 'you', 'last_move': 'e4'},
             {'id': 4822, 'color': 'black', 'turn': 'waiting', 'last_move': 'Nf3'},
