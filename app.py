@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from assets.lichess_api_functions import *
 from assets.gestion_env import *
+from assets.gestion_client import *
 from datetime import datetime
 
 app = Flask(__name__)
@@ -32,10 +33,9 @@ def connect_wifi():
 @app.route('/')
 def index():
     context = {"username": "Déconnecté", "is_connected": False}
-    if isThereATokenApiLichess():
+    client = get_client()
+    if client is not None:
         try:
-            token = getTokenApiLichess()
-            client = connect_to_lichess(token)
             account_info = get_account_info(client)
             context["username"] = account_info["username"]
             context["is_connected"] = True
@@ -49,11 +49,13 @@ def settings():
     if request.method == "POST":
         token = request.form.get("token")
         try:
-            client = connect_to_lichess(token)
+            init_client(token)  # valide le token et crée le client global
         except Exception:
             context["error"] = "Token invalide. Veuillez réessayer."
+            context["token"] = getTokenApiLichess() if isThereATokenApiLichess() else ""
+            context["is_connected"] = bool(context["token"])
             return render_template('settings.html', **context)
-        
+
         setTokenApiLichess(token)
         #print(f"Token API Lichess enregistré : {token}")
         context["success"] = "Token API Lichess enregistré avec succès."
@@ -64,25 +66,26 @@ def settings():
 @app.route('/logout', methods=['POST'])
 def logout():
     setTokenApiLichess("")
+    reset_client()
     return redirect(url_for('index'))
 
 @app.route('/create_ia')
 def create_ia():
-    if not isThereATokenApiLichess():
+    if get_client() is None:
         return redirect(url_for('settings'))
     else :
         return render_template('create_ia.html')
 
 @app.route('/create_online')
 def create_online():
-    if not isThereATokenApiLichess():
+    if get_client() is None:
         return redirect(url_for('settings'))
     else :
         return render_template('create_online.html')
 
 @app.route('/rejoindre')
 def rejoindre():
-    if not isThereATokenApiLichess():
+    if get_client() is None:
         return redirect(url_for('settings'))
     else :
         games = [
@@ -92,6 +95,8 @@ def rejoindre():
             {'id': 4824, 'color': 'black', 'turn': 'you', 'last_move': 'c5'},
         ]
         return render_template('rejoindre.html', games=games)
+
+init_client_from_env()  # connexion au lancement si un token est déjà enregistré
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
