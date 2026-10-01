@@ -5,7 +5,7 @@ from gpiozero import Button
 from signal import pause
 
 
-COUPS = ["e2e4", "g1f3", "f1c4", "e1g1"]   # coups programmés, joués dans l'ordre
+COUPS = ["e2e4", "g1f3", "f1c4"]   # coups programmés, joués dans l'ordre
 index = 0
 
 def jouer_coup():
