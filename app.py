@@ -133,6 +133,12 @@ def rejoindre():
         games = get_all_ongoing_games(get_client())
         return render_template('rejoindre.html', games=games)
 
+@app.route('/demonstrations')
+def demonstrations():
+    with open("assets/fichiers_pgn/infos.json", "r", encoding="utf-8") as f:
+        demos = json.load(f)
+    return render_template('demonstrations.html', demos=demos)
+
 @app.route('/partie/<game_id>')
 def suivi_partie(game_id):
     if get_client() is None:

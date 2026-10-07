@@ -1,0 +1,47 @@
+[
+	{   
+        "id": 1,
+		"nom": "La Partie Immortelle",
+		"date": "Londres, 1851",
+		"joueur1": "Anderssen",
+		"joueur2": "Kieseritzky",
+		"fichier_pgn": "1.pgn",
+		"description": "Sacrifices en cascade (dame, deux tours, un fou) pour un mat final spectaculaire. La partie la plus citée de l'histoire du jeu."
+	},
+    	{
+        "id": 2,
+		"nom": "Le Jeu de l'Opéra",
+		"date": "Paris, 1858",
+		"joueur1": "Morphy",
+		"joueur2": "Duc de Brunswick & Comte Isouard",
+		"fichier_pgn": "2.pgn",
+		"description": "17 coups, jouée pendant un opéra, modèle absolu de développement rapide et d'exploitation d'avantage matériel."
+	},
+    	{
+        "id": 3,
+		"nom": "La Partie du Siècle",
+		"date": "New York, 1956",
+		"joueur1": "Donald Byrne",
+		"joueur2": "Bobby Fischer",
+		"fichier_pgn": "3.pgn",
+		"description": "Fischer, 13 ans, sacrifie sa dame au coup 17 pour une combinaison gagnante. Symbole de l'émergence d'un génie."
+	},
+    	{
+        "id": 4,
+		"nom": "Deep Blue vs Kasparov, partie 1",
+		"date": "Philadelphie, 10 février 1996",
+		"joueur1": "Deep Blue",
+		"joueur2": "Garry Kasparov",
+		"fichier_pgn": "4.pgn",
+		"description": "C'est la première fois qu'un ordinateur bat un champion du monde en titre dans des conditions de tournoi classique. (Kasparov a remporté le match global cette année-là, mais c'est bien cette partie qui marque la première victoire d'une IA sur un humain au plus haut niveau.)"
+	},
+    	{
+        "id": 5,
+		"nom": "Deep Blue vs Kasparov, partie 6",
+		"date": "New York, 11 mai 1997",
+		"joueur1": "Deep Blue",
+		"joueur2": "Garry Kasparov",
+		"fichier_pgn": "5.pgn",
+		"description": "Revanche : Deep Blue remporte cette fois le match entier (3,5–2,5), et cette partie précise scelle la victoire. C'est celle-ci qui est restée dans l'histoire comme LE tournant symbolique (une IA bat officiellement l'humain au sommet)."
+	}
+]
