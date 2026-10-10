@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <title>M.A.E.L. - Documentation</title>
+        <!-- Gabarit dédié à l'export PDF (xhtml2pdf) : pas de Tailwind ni de polices web, CSS simple uniquement -->
+        <style>
+            @page {
+                size: a4 portrait;
+                margin: 2cm 2cm 2.2cm 2cm;
+                @frame footer {
+                    -pdf-frame-content: footer;
+                    bottom: 1cm;
+                    margin-left: 2cm;
+                    margin-right: 2cm;
+                    height: 0.6cm;
+                }
+            }
+
+            body {
+                font-family: Helvetica;
+                font-size: 10.5pt;
+                line-height: 1.45;
+                color: #2a2a2a;
+            }
+
+            h1 {
+                font-family: Times-Roman;
+                font-size: 26pt;
+                font-weight: normal;
+                color: #131313;
+                margin: 0 0 14pt;
+            }
+
+            h2 {
+                font-family: Times-Roman;
+                font-size: 17pt;
+                font-weight: normal;
+                color: #775a19;
+                margin: 20pt 0 8pt;
+                padding-bottom: 3pt;
+                border-bottom: 0.5pt solid #c5a059;
+                -pdf-keep-with-next: true;
+            }
+
+            h3 {
+                font-family: Times-Roman;
+                font-size: 13pt;
+                font-weight: normal;
+                color: #131313;
+                margin: 14pt 0 6pt;
+                -pdf-keep-with-next: true;
+            }
+
+            p { margin: 0 0 7pt; }
+            a { color: #775a19; text-decoration: none; }
+            strong { color: #131313; }
+
+            ul, ol { margin: 0 0 7pt; }
+            li { margin: 2pt 0; }
+            li ul, li ol { margin: 2pt 0 2pt 18pt; }
+
+            img { width: 15cm; }
+
+            blockquote {
+                margin: 0 0 8pt;
+                padding: 6pt 10pt;
+                background-color: #f6efe1;
+                border-left: 2pt solid #c5a059;
+            }
+
+            code {
+                font-family: Courier;
+                font-size: 9.5pt;
+                color: #5d4201;
+                background-color: #f1ede6;
+            }
+
+            pre {
+                font-family: Courier;
+                font-size: 9pt;
+                padding: 6pt;
+                background-color: #f1ede6;
+            }
+
+            table { margin: 0 0 8pt; }
+
+            th {
+                text-align: left;
+                font-size: 9pt;
+                color: #775a19;
+                border-bottom: 0.75pt solid #c5a059;
+                padding: 4pt 6pt 3pt;
+            }
+
+            td {
+                border-bottom: 0.5pt solid #ddd5c8;
+                padding: 4pt 6pt 3pt;
+                vertical-align: top;
+            }
+
+            #footer {
+                font-size: 8pt;
+                color: #9a8f80;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="footer">M.A.E.L. - Documentation · page <pdf:pagenumber> / <pdf:pagecount></div>
+        {{ contenu | safe }}
+    </body>
+</html>

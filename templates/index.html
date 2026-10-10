@@ -115,11 +115,18 @@
                 <div class="flex md:hidden flex-col gap-4 mb-8">
                     <div class="flex items-center justify-between">
                         <h2 class="page-title-mobile">M.A.E.L.</h2>
-                        <a href="{{ url_for('settings') }}">
-                            <button class="settings-btn">
-                                <span class="material-symbols-outlined text-2xl">settings</span>
-                            </button>
-                        </a>
+                        <div class="flex items-center">
+                            <a href="{{ url_for('documentation') }}" title="Documentation">
+                                <button class="settings-btn">
+                                    <span class="material-symbols-outlined text-2xl">menu_book</span>
+                                </button>
+                            </a>
+                            <a href="{{ url_for('settings') }}">
+                                <button class="settings-btn">
+                                    <span class="material-symbols-outlined text-2xl">settings</span>
+                                </button>
+                            </a>
+                        </div>
                     </div>
                     <div class="status-badge status-badge--desktop self-start">
                         <div class="status-dot-{{ 'success' if is_connected else 'error' }} status-dot-{{ 'success' if is_connected else 'error' }}--desktop"></div>
@@ -140,6 +147,11 @@
                                 <span class="tracking-widest uppercase text-nowrap">Compte Lichess : {{ username }}</span>
                             </div>
                         </div>
+                        <a href="{{ url_for('documentation') }}" title="Documentation">
+                            <button class="settings-btn">
+                            <span class="material-symbols-outlined text-2xl">menu_book</span>
+                        </button>
+                        </a>
                         <a href="{{ url_for('settings') }}">
                             <button class="settings-btn">
                             <span class="material-symbols-outlined text-2xl">settings</span>

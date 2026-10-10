@@ -2,3 +2,5 @@ berserk
 flask
 gpiozero
 python-dotenv
+markdown
+xhtml2pdf

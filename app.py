@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, Response
+from flask import Flask, render_template, request, redirect, url_for, Response, send_from_directory
 from assets.lichess_api_functions import *
 from assets.gestion_env import *
 from assets.gestion_client import *
 from datetime import datetime
 import json
+import os
+import io
+import markdown
 
 app = Flask(__name__)
 
@@ -138,6 +141,37 @@ def demonstrations():
     with open("assets/fichiers_pgn/infos.json", "r", encoding="utf-8") as f:
         demos = json.load(f)
     return render_template('demonstrations.html', demos=demos)
+
+DOC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "documentation")
+
+def lire_documentation_html(images_url):
+    # Convertit le markdown de la doc en HTML ; les images (chemins relatifs "images/...")
+    # sont réécrites avec le préfixe images_url (URL web ou chemin disque pour le PDF).
+    with open(os.path.join(DOC_DIR, "documentation.md"), "r", encoding="utf-8") as f:
+        html = markdown.markdown(f.read(), extensions=['toc', 'tables', 'sane_lists'])
+    return html.replace('src="images/', f'src="{images_url}')
+
+@app.route('/documentation')
+def documentation():
+    contenu = lire_documentation_html(url_for('documentation_image', filename=''))
+    return render_template('documentation.html', contenu=contenu)
+
+@app.route('/documentation/images/<path:filename>')
+def documentation_image(filename):
+    return send_from_directory(os.path.join(DOC_DIR, "images"), filename)
+
+@app.route('/documentation/pdf')
+def documentation_pdf():
+    from xhtml2pdf import pisa  # import local : dépendance lourde, utile uniquement ici
+    contenu = lire_documentation_html(os.path.join(DOC_DIR, "images", ""))
+    html = render_template('documentation_pdf.html', contenu=contenu)
+    pdf = io.BytesIO()
+    pisa.CreatePDF(html, dest=pdf, encoding="utf-8")
+    return Response(
+        pdf.getvalue(),
+        mimetype='application/pdf',
+        headers={'Content-Disposition': 'attachment; filename="Documentation_MAEL.pdf"'},
+    )
 
 @app.route('/partie/<game_id>')
 def suivi_partie(game_id):
