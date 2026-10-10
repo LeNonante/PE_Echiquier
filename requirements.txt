@@ -4,3 +4,5 @@ gpiozero
 python-dotenv
 markdown
 xhtml2pdf
+chess
+pytest

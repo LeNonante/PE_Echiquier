@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>M.A.E.L. - Simulateur de plateau</title>
+
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+        <style>
+            body {
+                margin: 0;
+                color: #e5e2e1;
+                font-family: 'Manrope', sans-serif;
+            }
+
+            /* ---------- Back button ---------- */
+            .back-btn {
+                position: absolute;
+                top: 32px;
+                left: 24px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #d1c5b4;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                padding: 8px;
+                border-radius: 0.25rem;
+                transition: color 0.2s, background-color 0.2s;
+            }
+
+            .back-btn:hover {
+                color: #e9c176;
+                background-color: rgba(233, 193, 118, 0.08);
+            }
+
+            .header {
+                text-align: center;
+                margin: 40px 0 28px;
+            }
+
+            .header h2 {
+                font-family: 'Libre Caslon Text', serif;
+                font-size: 32px;
+                line-height: 40px;
+                font-weight: 400;
+                margin: 4px 0 0;
+            }
+
+            .header p {
+                color: #9a8f80;
+                font-size: 14px;
+                margin: 8px 0 0;
+            }
+
+            /* ---------- Layout ---------- */
+            .layout {
+                display: grid;
+                grid-template-columns: minmax(0, 560px) minmax(0, 340px);
+                gap: 32px;
+                justify-content: center;
+                align-items: start;
+            }
+
+            @media (max-width: 900px) {
+                .layout {
+                    grid-template-columns: minmax(0, 560px);
+                }
+            }
+
+            /* ---------- Board ---------- */
+            .board {
+                display: grid;
+                grid-template-columns: repeat(8, 1fr);
+                aspect-ratio: 1;
+                width: 100%;
+                border: 6px solid #2a2a2a;
+                border-radius: 0.25rem;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+                user-select: none;
+            }
+
+            .square {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: clamp(26px, 8.5vw, 54px);
+                line-height: 1;
+            }
+
+            .square.light { background-color: #e8d9bc; }
+            .square.dark { background-color: #a67c52; }
+
+            .square .coord {
+                position: absolute;
+                font-size: 10px;
+                font-weight: 600;
+                opacity: 0.7;
+            }
+
+            .square .coord.file { bottom: 2px; right: 4px; }
+            .square .coord.rank { top: 2px; left: 4px; }
+            .square.light .coord { color: #a67c52; }
+            .square.dark .coord { color: #e8d9bc; }
+
+            .piece {
+                font-variant-emoji: text;
+            }
+
+            .piece.white {
+                color: #fbf8f2;
+                text-shadow: 0 0 2px #000, 0 0 1px #000, 0 1px 2px rgba(0, 0, 0, 0.6);
+            }
+
+            .piece.black {
+                color: #1b1a19;
+                text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+            }
+
+            /* Vue capteurs : on ne montre que ce que voit la board */
+            .board.sensors .piece { display: none; }
+            .board.sensors .square.occupied::after {
+                content: "";
+                width: 34%;
+                height: 34%;
+                border-radius: 50%;
+                background-color: #2b6cb0;
+                box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7);
+            }
+
+            /* Indications (LED) */
+            .square[data-role]::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+            }
+
+            .square[data-role="depart"]::before { box-shadow: inset 0 0 0 4px #e9c176; background: rgba(233, 193, 118, 0.25); }
+            .square[data-role="arrivee"]::before { box-shadow: inset 0 0 0 4px #3fa45b; background: rgba(63, 164, 91, 0.3); }
+            .square[data-role="prise"]::before { box-shadow: inset 0 0 0 4px #e8772e; background: rgba(232, 119, 46, 0.3); }
+            .square[data-role="erreur"]::before { box-shadow: inset 0 0 0 4px #e5484d; background: rgba(229, 72, 77, 0.35); }
+
+            .legend {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 14px;
+                margin-top: 14px;
+                font-size: 12px;
+                color: #d1c5b4;
+            }
+
+            .legend span::before {
+                content: "";
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                margin-right: 6px;
+                border-radius: 2px;
+                vertical-align: -1px;
+            }
+
+            .legend .l-depart::before { background: #e9c176; }
+            .legend .l-arrivee::before { background: #3fa45b; }
+            .legend .l-prise::before { background: #e8772e; }
+            .legend .l-erreur::before { background: #e5484d; }
+
+            /* ---------- Panel ---------- */
+            .card {
+                background-color: #1c1b1b;
+                border: 1px solid rgba(245, 242, 237, 0.08);
+                border-radius: 0.5rem;
+                padding: 16px 18px;
+                margin-bottom: 16px;
+            }
+
+            .card-label {
+                font-size: 12px;
+                letter-spacing: 0.08em;
+                font-weight: 600;
+                color: #9a8f80;
+                text-transform: uppercase;
+                margin-bottom: 8px;
+            }
+
+            .message {
+                font-size: 15px;
+                font-weight: 600;
+                line-height: 22px;
+            }
+
+            .meta {
+                font-size: 13px;
+                color: #9a8f80;
+                margin-top: 6px;
+            }
+
+            .chips {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                min-height: 44px;
+                align-items: center;
+            }
+
+            .chip {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 44px;
+                height: 44px;
+                font-size: 30px;
+                background-color: #a67c52;
+                border: 2px solid transparent;
+                border-radius: 0.25rem;
+                cursor: pointer;
+            }
+
+            .chip.selected { border-color: #e9c176; }
+            .chips .empty { color: #6f665a; font-size: 13px; }
+
+            .btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                width: 100%;
+                padding: 11px 14px;
+                margin-top: 8px;
+                font-family: 'Manrope', sans-serif;
+                font-size: 14px;
+                font-weight: 600;
+                color: #e5e2e1;
+                background-color: #2a2a2a;
+                border: 1px solid rgba(245, 242, 237, 0.08);
+                border-radius: 0.25rem;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            .btn:hover { background-color: #353535; }
+            .btn:disabled { opacity: 0.4; cursor: default; }
+            .btn .material-symbols-outlined { font-size: 20px; }
+
+            .btn.primary {
+                color: #412d00;
+                background-color: #e9c176;
+                font-size: 15px;
+                padding: 14px;
+            }
+
+            .btn.primary:hover { background-color: #ffdea5; }
+
+            .btn-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .moves {
+                font-size: 13px;
+                line-height: 22px;
+                color: #d1c5b4;
+                max-height: 140px;
+                overflow-y: auto;
+            }
+        </style>
+    </head>
+
+    <body>
+        <main class="page-main" style="justify-content:flex-start;">
+
+            <a href="{{ url_for('index') }}" class="back-btn">
+                <span class="material-symbols-outlined">arrow_back</span>
+                <span>Retour</span>
+            </a>
+
+            <div class="header">
+                <h1 class="page-tagline" style="margin:0;">Mode développement</h1>
+                <h2>Simulateur de plateau</h2>
+                <p>Remplace la board physique : cliquez une pièce pour la prendre, puis une case pour la poser.</p>
+            </div>
+
+            <div class="layout">
+                <section>
+                    <div class="board" id="board"></div>
+                    <div class="legend">
+                        <span class="l-depart">Départ</span>
+                        <span class="l-arrivee">Arrivée</span>
+                        <span class="l-prise">Pièce à prendre</span>
+                        <span class="l-erreur">Erreur</span>
+                    </div>
+                </section>
+
+                <section>
+                    <div class="card">
+                        <div class="card-label" id="partie-label">Aucune partie</div>
+                        <div class="message" id="message">Lancez une partie locale, ou ouvrez une partie Lichess dans un autre onglet.</div>
+                        <div class="meta" id="meta"></div>
+                    </div>
+
+                    <button class="btn primary" id="btn-bouton">
+                        <span class="material-symbols-outlined">radio_button_checked</span>
+                        Bouton du plateau (valider le coup)
+                    </button>
+
+                    <div class="card" style="margin-top:16px;">
+                        <div class="card-label">Pièces en main</div>
+                        <div class="chips" id="main"></div>
+                        <button class="btn" id="btn-hors-plateau">Poser la pièce hors du plateau</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-label">Hors du plateau (cliquez pour reprendre)</div>
+                        <div class="chips" id="hors-plateau"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-label">Coups joués</div>
+                        <div class="moves" id="moves">—</div>
+                    </div>
+
+                    <button class="btn" id="btn-locale">
+                        <span class="material-symbols-outlined">swords</span>
+                        Nouvelle partie locale (sans Lichess)
+                    </button>
+                    <div class="btn-row">
+                        <button class="btn" id="btn-caler" title="Pose les pièces exactement comme dans la partie en cours">Caler sur la partie</button>
+                        <button class="btn" id="btn-depart">Position de départ</button>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn" id="btn-retourner">
+                            <span class="material-symbols-outlined">swap_vert</span> Retourner
+                        </button>
+                        <button class="btn" id="btn-capteurs">
+                            <span class="material-symbols-outlined">sensors</span> Vue capteurs
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <script>
+            const GLYPHES = { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
+            const FICHIERS = "abcdefgh";
+
+            const els = {
+                board: document.getElementById("board"),
+                partieLabel: document.getElementById("partie-label"),
+                message: document.getElementById("message"),
+                meta: document.getElementById("meta"),
+                main: document.getElementById("main"),
+                horsPlateau: document.getElementById("hors-plateau"),
+                moves: document.getElementById("moves"),
+                btnCaler: document.getElementById("btn-caler"),
+                btnHorsPlateau: document.getElementById("btn-hors-plateau"),
+                btnCapteurs: document.getElementById("btn-capteurs"),
+            };
+
+            let etat = null;
+            let selection = null;       // indice de la pièce choisie dans la main (null = la dernière)
+            let orientation = null;     // "white" ou "black" ; null = suivre la couleur jouée
+
+            function glyphe(symbole) {
+                const couleur = symbole === symbole.toUpperCase() ? "white" : "black";
+                // ︎ : force l'affichage texte (sinon ♟ devient un emoji sur certains systèmes)
+                return `<span class="piece ${couleur}">${GLYPHES[symbole.toLowerCase()]}︎</span>`;
+            }
+
+            function renderBoard() {
+                const { pieces, affichage } = etat.plateau;
+                const sens = orientation || (etat.partie && etat.partie.couleur) || "white";
+                const rangs = sens === "white" ? [7, 6, 5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5, 6, 7];
+                const colonnes = sens === "white" ? [0, 1, 2, 3, 4, 5, 6, 7] : [7, 6, 5, 4, 3, 2, 1, 0];
+
+                let html = "";
+                rangs.forEach((r, i) => {
+                    colonnes.forEach((c, j) => {
+                        const nom = FICHIERS[c] + (r + 1);
+                        const teinte = (r + c) % 2 === 0 ? "dark" : "light";
+                        const occupee = nom in pieces;
+                        const role = affichage[nom] ? ` data-role="${affichage[nom]}"` : "";
+                        html += `<div class="square ${teinte}${occupee ? " occupied" : ""}" data-case="${nom}"${role}>`;
+                        if (j === 0) html += `<span class="coord rank">${r + 1}</span>`;
+                        if (i === 7) html += `<span class="coord file">${FICHIERS[c]}</span>`;
+                        if (occupee) html += glyphe(pieces[nom]);
+                        html += "</div>";
+                    });
+                });
+                els.board.innerHTML = html;
+            }
+
+            function renderChips(conteneur, liste, avecSelection, vide) {
+                if (!liste.length) {
+                    conteneur.innerHTML = `<span class="empty">${vide}</span>`;
+                    return;
+                }
+                const choisie = selection === null ? liste.length - 1 : selection;
+                conteneur.innerHTML = liste.map((s, i) => {
+                    const classe = avecSelection && i === choisie ? " selected" : "";
+                    return `<div class="chip${classe}" data-index="${i}">${glyphe(s)}</div>`;
+                }).join("");
+            }
+
+            function renderPartie() {
+                const partie = etat.partie;
+                els.btnCaler.disabled = !partie;
+                if (!partie) return;
+
+                const couleurs = { white: "Blancs", black: "Noirs" };
+                els.partieLabel.textContent = partie.mode === "lichess"
+                    ? `Partie Lichess #${partie.game_id}`
+                    : "Partie locale";
+                els.message.textContent = partie.message;
+                const infos = [];
+                if (partie.couleur) infos.push(`Vous jouez les ${couleurs[partie.couleur]}`);
+                if (!partie.terminee) infos.push(`Trait aux ${couleurs[partie.trait]}`);
+                infos.push(partie.synchro ? "Plateau synchronisé" : "Plateau à corriger");
+                els.meta.textContent = infos.join(" • ");
+
+                els.moves.textContent = partie.coups.length
+                    ? partie.coups.map((c, i) => (i % 2 === 0 ? `${i / 2 + 1}. ` : "") + c).join(" ")
+                    : "—";
+            }
+
+            function render(nouvelEtat) {
+                etat = nouvelEtat;
+                if (selection !== null && selection >= etat.plateau.main.length) selection = null;
+                renderBoard();
+                renderChips(els.main, etat.plateau.main, true, "Main vide");
+                renderChips(els.horsPlateau, etat.plateau.hors_plateau, false, "Aucune pièce");
+                els.btnHorsPlateau.disabled = !etat.plateau.main.length;
+                renderPartie();
+            }
+
+            async function action(nom, donnees = {}) {
+                const reponse = await fetch("{{ url_for('simulateur_action') }}", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: nom, ...donnees }),
+                });
+                if (reponse.ok) render(await reponse.json());
+            }
+
+            async function rafraichir() {
+                try {
+                    const reponse = await fetch("{{ url_for('simulateur_etat') }}");
+                    if (reponse.ok) render(await reponse.json());
+                } catch (e) {
+                    // serveur momentanément indisponible : on réessaie au prochain tour
+                }
+            }
+
+            // ---------- Événements ----------
+            els.board.addEventListener("click", (e) => {
+                const carre = e.target.closest(".square");
+                if (!carre) return;
+                action("case", { case: carre.dataset.case, index_main: selection });
+                selection = null;
+            });
+
+            els.main.addEventListener("click", (e) => {
+                const chip = e.target.closest(".chip");
+                if (!chip) return;
+                selection = Number(chip.dataset.index);
+                render(etat);
+            });
+
+            els.horsPlateau.addEventListener("click", (e) => {
+                const chip = e.target.closest(".chip");
+                if (chip) action("reprendre", { index: Number(chip.dataset.index) });
+            });
+
+            els.btnHorsPlateau.addEventListener("click", () => {
+                const index = selection === null ? etat.plateau.main.length - 1 : selection;
+                selection = null;
+                action("hors_plateau", { index });
+            });
+
+            document.getElementById("btn-bouton").addEventListener("click", () => action("bouton"));
+            document.getElementById("btn-locale").addEventListener("click", () => action("partie_locale"));
+            document.getElementById("btn-depart").addEventListener("click", () => action("depart"));
+            els.btnCaler.addEventListener("click", () => action("caler"));
+
+            document.getElementById("btn-retourner").addEventListener("click", () => {
+                const actuelle = orientation || (etat.partie && etat.partie.couleur) || "white";
+                orientation = actuelle === "white" ? "black" : "white";
+                renderBoard();
+            });
+
+            els.btnCapteurs.addEventListener("click", () => {
+                const actif = els.board.classList.toggle("sensors");
+                els.btnCapteurs.classList.toggle("primary", actif);
+            });
+
+            // Barre d'espace = bouton du plateau
+            document.addEventListener("keydown", (e) => {
+                if (e.code === "Space") {
+                    e.preventDefault();
+                    action("bouton");
+                }
+            });
+
+            rafraichir();
+            setInterval(rafraichir, 500);  // le flux Lichess peut changer l'état à tout moment
+        </script>
+    </body>
+</html>

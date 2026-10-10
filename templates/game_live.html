@@ -280,6 +280,15 @@
                         <!-- Status banner (fin de partie) -->
                         <div class="status-banner" id="status-banner" hidden></div>
 
+                        {% if simulateur %}
+                        <div class="mt-6 text-center">
+                            <a href="{{ url_for('simulateur') }}" target="_blank" class="back-btn" style="display:inline-flex;">
+                                <span class="material-symbols-outlined text-xl">grid_on</span>
+                                Jouer sur le simulateur de plateau
+                            </a>
+                        </div>
+                        {% endif %}
+
                     </div>
                 </div>
 

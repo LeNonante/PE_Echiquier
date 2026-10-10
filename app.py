@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, Response, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, Response, send_from_directory, jsonify, abort
 from assets.lichess_api_functions import *
 from assets.gestion_env import *
 from assets.gestion_client import *
+from assets.plateau import get_plateau, est_simule
+from assets.plateau.partie import get_partie_active, demarrer_partie_locale, demarrer_partie_lichess
+import chess
 from datetime import datetime
 import json
 import os
@@ -177,7 +180,11 @@ def documentation_pdf():
 def suivi_partie(game_id):
     if get_client() is None:
         return redirect(url_for('settings'))
-    return render_template('game_live.html', game_id=game_id)
+    try:
+        demarrer_partie_lichess(get_client(), get_plateau(), game_id)  # relie le plateau à la partie
+    except Exception as e:
+        print(f"[suivi_partie] impossible de relier le plateau à la partie {game_id} : {e}")
+    return render_template('game_live.html', game_id=game_id, simulateur=est_simule())
 
 @app.route('/partie/<game_id>/stream')
 def suivi_partie_stream(game_id):
@@ -198,6 +205,53 @@ def suivi_partie_stream(game_id):
         mimetype='text/event-stream',
         headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'},
     )
+
+#------------------------- SIMULATEUR DE PLATEAU -------------------------
+def etat_simulateur():
+    partie = get_partie_active()
+    return {"plateau": get_plateau().etat(), "partie": partie.etat() if partie else None}
+
+@app.route('/simulateur')
+def simulateur():
+    if not est_simule():
+        abort(404)
+    return render_template('simulateur.html')
+
+@app.route('/simulateur/etat')
+def simulateur_etat():
+    if not est_simule():
+        abort(404)
+    return jsonify(etat_simulateur())
+
+@app.route('/simulateur/action', methods=['POST'])
+def simulateur_action():
+    if not est_simule():
+        abort(404)
+    plateau = get_plateau()
+    data = request.get_json(silent=True) or {}
+    action = data.get('action')
+    try:
+        if action == 'case':
+            plateau.cliquer_case(chess.parse_square(data['case']), data.get('index_main'))
+        elif action == 'hors_plateau':
+            plateau.poser_hors_plateau(int(data['index']))
+        elif action == 'reprendre':
+            plateau.reprendre_hors_plateau(int(data['index']))
+        elif action == 'bouton':
+            plateau.appuyer_bouton()
+        elif action == 'depart':
+            plateau.reinitialiser()
+        elif action == 'caler':
+            partie = get_partie_active()
+            plateau.reinitialiser(partie.board.fen() if partie else chess.STARTING_FEN)
+        elif action == 'partie_locale':
+            plateau.reinitialiser()
+            demarrer_partie_locale(plateau)
+        else:
+            return jsonify({"error": f"Action inconnue : {action}"}), 400
+    except (KeyError, ValueError) as e:
+        return jsonify({"error": f"Requête invalide : {e}"}), 400
+    return jsonify(etat_simulateur())
 
 init_client_from_env()  # connexion au lancement si un token est déjà enregistré
 

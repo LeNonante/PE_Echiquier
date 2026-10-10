@@ -15,3 +15,10 @@ def setTokenApiLichess(token) :
 def getTokenApiLichess() :
     vals = dotenv_values()
     return vals.get("TOKEN_API_LICHESS", "")
+
+
+#------------------------- TYPE DE PLATEAU -------------------------
+def getTypePlateau() :
+    #"simule" (par défaut) ou "physique"
+    vals = dotenv_values()
+    return vals.get("PLATEAU", "simule")
