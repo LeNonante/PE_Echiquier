@@ -29,7 +29,7 @@ L'échiquier communique avec Lichess grâce à un **token d'API** personnel.
 ### Obtenir un token
 
 1. Connectez-vous à votre compte sur [lichess.org](https://lichess.org).
-2. Ouvrez la page [Jetons d'accès personnels](https://lichess.org/account/oauth/token).
+2. Ouvrez la page [Jetons d'accès personnels](https://lichess.org/account/oauth/token) (Préférences → API access tokens).
 3. Créez un nouveau jeton en cochant au minimum les autorisations :
     - `challenge:read`
     - `challenge:write`
