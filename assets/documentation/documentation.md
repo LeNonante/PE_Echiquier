@@ -41,7 +41,7 @@ L'échiquier communique avec Lichess grâce à un **token d'API** personnel.
 
 ### Enregistrer le token dans l'échiquier
 
-Cliquez sur l'icône **paramètres** en haut à droite de l'accueil, collez le jeton puis enregistrez. Si le jeton est valide, le badge **Compte Lichess** de l'accueil affiche votre pseudo avec un voyant vert. Un voyant rouge indique que l'échiquier n'est pas connecté.
+Cliquez sur l'icône **paramètres** en haut à droite de l'accueil, collez le jeton puis enregistrez. Si le jeton est valide, le badge **Compte Lichess** de l'accueil affiche votre pseudo avec un voyant vert. Un voyant rouge indique que le compte Lichess n'est pas connecté.
 
 Le bouton **Se déconnecter** de la même page efface le jeton enregistré.
 
