@@ -260,6 +260,64 @@
                 transform: rotate(45deg);
             }
 
+            /* ---------- Tooltip ---------- */
+            .info-tooltip {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                margin-left: 6px;
+                vertical-align: middle;
+                color: #9a8f80;
+                cursor: help;
+                outline: none;
+                transition: color 0.15s;
+            }
+
+            .info-tooltip .material-symbols-outlined { font-size: 16px; }
+
+            .info-tooltip:hover,
+            .info-tooltip:focus { color: #e9c176; }
+
+            .info-tooltip-content {
+                position: absolute;
+                bottom: calc(100% + 8px);
+                left: 50%;
+                transform: translateX(-50%);
+                width: 260px;
+                max-width: 70vw;
+                padding: 10px 12px;
+                background-color: #2a2a2a;
+                border: 1px solid rgba(233, 193, 118, 0.3);
+                border-radius: 0.25rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+                font-family: 'Manrope', sans-serif;
+                font-size: 12px;
+                line-height: 18px;
+                color: #e5e2e1;
+                text-align: left;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: opacity 0.15s, visibility 0.15s;
+                z-index: 10;
+            }
+
+            .info-tooltip-content::after {
+                content: '';
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 6px solid transparent;
+                border-top-color: #2a2a2a;
+            }
+
+            .info-tooltip:hover .info-tooltip-content,
+            .info-tooltip:focus .info-tooltip-content {
+                opacity: 1;
+                visibility: visible;
+            }
+
             /* ---------- Divider ---------- */
             .section-divider {
                 border: none;
@@ -442,7 +500,16 @@
                                     <!-- Limite de temps -->
                                     <div>
                                         <div class="flex items-center justify-between mb-2">
-                                            <span style="font-family:'Manrope',sans-serif;font-size:14px;color:#d1c5b4;">Limite de temps</span>
+                                            <span style="font-family:'Manrope',sans-serif;font-size:14px;color:#d1c5b4;display:inline-flex;align-items:center;">
+                                                Limite de temps
+                                                <span class="info-tooltip" tabindex="0" aria-label="Aide : limite de temps">
+                                                    <span class="material-symbols-outlined">info</span>
+                                                    <span class="info-tooltip-content" role="tooltip">
+                                                        Temps total dont dispose chaque joueur pour toute la partie. Votre pendule ne tourne que pendant votre tour&nbsp;; si elle atteint zéro, vous perdez la partie.<br>
+                                                        Ex.&nbsp;: 600&nbsp;s = 10 minutes par joueur.
+                                                    </span>
+                                                </span>
+                                            </span>
                                             <label class="custom-checkbox">
                                                 <input type="checkbox" id="no-time-limit" name="no_clock_limit" onchange="toggleTimeInput('time-limit', this)">
                                                 Sans limite
@@ -465,7 +532,16 @@
                                     <!-- Incrément -->
                                     <div>
                                         <div class="flex items-center justify-between mb-2">
-                                            <span style="font-family:'Manrope',sans-serif;font-size:14px;color:#d1c5b4;">Incrément par coup</span>
+                                            <span style="font-family:'Manrope',sans-serif;font-size:14px;color:#d1c5b4;display:inline-flex;align-items:center;">
+                                                Incrément par coup
+                                                <span class="info-tooltip" tabindex="0" aria-label="Aide : incrément par coup">
+                                                    <span class="material-symbols-outlined">info</span>
+                                                    <span class="info-tooltip-content" role="tooltip">
+                                                        Temps ajouté à votre pendule après chaque coup joué.<br>
+                                                        Ex.&nbsp;: avec 600&nbsp;s et un incrément de 5&nbsp;s, vous gagnez 5 secondes à chaque coup.
+                                                    </span>
+                                                </span>
+                                            </span>
                                             <label class="custom-checkbox">
                                                 <input type="checkbox" id="no-increment" name="no_clock_increment" onchange="toggleTimeInput('increment', this)" checked>
                                                 Sans incrément
