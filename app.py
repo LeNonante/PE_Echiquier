@@ -32,6 +32,20 @@ def connect_wifi():
     return "Connexion en cours, le Pi va redémarrer..."
 
 
+@app.route('/img_sondage_1')
+def img_sondage_1():
+    return send_from_directory('static', 'img/sondage_1.png')
+
+@app.route('/img_sondage_2')
+def img_sondage_2():
+    return send_from_directory('static', 'img/sondage_2.png')
+
+@app.route('/img_sondage_3')
+def img_sondage_3():
+    return send_from_directory('static', 'img/sondage_3.png')
+
+
+
 @app.route('/')
 def index():
     context = {"username": "Déconnecté", "is_connected": False}
@@ -66,8 +80,8 @@ def settings():
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    setTokenApiLichess("")
-    reset_client()
+    #setTokenApiLichess("")
+    #reset_client()
     return redirect(url_for('index'))
 
 @app.route('/create_ia', methods=['GET', 'POST'])
@@ -91,9 +105,10 @@ def create_ia():
             if clock_limit not in (15, 30, 45) and (clock_limit <= 0 or clock_limit % 60 != 0):
                 return render_template('create_ia.html', error="Limite de temps invalide : Veuillez choisir 15, 30, 45s ou un multiple de 60s.")
 
-        partie = creer_partie_ia(get_client(), level, color, clock_limit, clock_increment)
-        game_id = partie['id']
-        return redirect(url_for('suivi_partie', game_id=game_id))
+        #partie = creer_partie_ia(get_client(), level, color, clock_limit, clock_increment)
+        #game_id = partie['id']
+        #return redirect(url_for('suivi_partie', game_id=game_id))
+        return render_template('create_ia.html')
     else :
         return render_template('create_ia.html')
 
@@ -119,11 +134,12 @@ def create_online():
             clock_increment = 0 if no_clock_increment is not None else int(clock_increment)
             if clock_limit not in (15, 30, 45) and (clock_limit <= 0 or clock_limit % 60 != 0):
                 return render_template('create_online.html', error="Limite de temps invalide : Veuillez choisir 15, 30, 45s ou un multiple de 60s.")
-        try:
-            challenge = creer_partie_contre_joueur(get_client(), adversaire, rated=False, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
-        except Exception:
-            return render_template('create_online.html', error=f"Impossible de défier « {adversaire} ». Vérifiez que ce pseudo existe et qu'il accepte les défis.")
-        print(challenge['id'])
+        #try:
+            #challenge = creer_partie_contre_joueur(get_client(), adversaire, rated=False, color=color, clock_limit=clock_limit, clock_increment=clock_increment)
+        
+        #except Exception:
+        #    return render_template('create_online.html', error=f"Impossible de défier « {adversaire} ». Vérifiez que ce pseudo existe et qu'il accepte les défis.")
+        #print(challenge['id'])
         return render_template('create_online.html')
     else :
         return render_template('create_online.html')
@@ -175,12 +191,16 @@ def documentation_pdf():
 
 @app.route('/partie/<game_id>')
 def suivi_partie(game_id):
+    """
     if get_client() is None:
         return redirect(url_for('settings'))
     return render_template('game_live.html', game_id=game_id)
+    """
+    return render_template('index.html', game_id=game_id)
 
 @app.route('/partie/<game_id>/stream')
 def suivi_partie_stream(game_id):
+    """
     client = get_client()
     if client is None:
         return redirect(url_for('settings'))
@@ -198,6 +218,7 @@ def suivi_partie_stream(game_id):
         mimetype='text/event-stream',
         headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'},
     )
+    """
 
 init_client_from_env()  # connexion au lancement si un token est déjà enregistré
 
