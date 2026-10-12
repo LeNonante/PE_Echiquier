@@ -225,4 +225,4 @@ init_client_from_env()  # connexion au lancement si un token est déjà enregist
 if __name__ == '__main__':
     # threaded=True : indispensable pour que le flux SSE de suivi de partie (connexion
     # longue durée) ne bloque pas les autres requêtes sur le serveur de développement.
-    app.run(host='0.0.0.0', port=80, debug=True, threaded=True)
+    app.run(host='0.0.0.0', port=80, threaded=True)

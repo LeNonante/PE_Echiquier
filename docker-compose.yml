@@ -1,0 +1,15 @@
+services:  
+  site_demo_pe_mael:
+    container_name: site_demo_pe_mael
+    build: ./site_demo_pe_mael
+    restart: unless-stopped
+    expose:
+      - 80
+    volumes:
+      - ./site_demo_pe_mael:/app
+    networks:
+      - services_net
+
+networks:
+  services_net:
+    external: true
