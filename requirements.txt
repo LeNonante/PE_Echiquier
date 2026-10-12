@@ -4,3 +4,4 @@ gpiozero
 python-dotenv
 markdown
 xhtml2pdf
+gunicorn
