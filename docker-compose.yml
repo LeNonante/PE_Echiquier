@@ -1,7 +1,7 @@
 services:  
   site_demo_pe_mael:
     container_name: site_demo_pe_mael
-    build: ./site_demo_pe_mael
+    build: .
     restart: unless-stopped
     expose:
       - 80
