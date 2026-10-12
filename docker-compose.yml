@@ -5,8 +5,6 @@ services:
     restart: unless-stopped
     expose:
       - 80
-    volumes:
-      - ./site_demo_pe_mael:/app
     networks:
       - services_net
 
