@@ -13,25 +13,6 @@ app = Flask(__name__)
 
 import subprocess
 
-
-@app.route('/wifi_setup')
-def wifi_setup():
-    return render_template('wifi_setup.html')
-
-@app.route('/connect_wifi', methods=['POST'])
-def connect_wifi():
-    ssid = request.form['ssid']
-    password = request.form['password']
-    subprocess.run(["nmcli", "connection", "add", "type", "wifi",
-                     "ifname", "wlan0", "con-name", ssid, "ssid", ssid])
-    subprocess.run(["nmcli", "connection", "modify", ssid,
-                     "wifi-sec.key-mgmt", "wpa-psk",
-                     "wifi-sec.psk", password,
-                     "connection.autoconnect-priority", "10"])
-    subprocess.run(["reboot"])
-    return "Connexion en cours, le Pi va redémarrer..."
-
-
 @app.route('/')
 def index():
     context = {"username": "Déconnecté", "is_connected": False}
