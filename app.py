@@ -11,7 +11,6 @@ import markdown
 app = Flask(__name__)
 
 
-import subprocess
 
 @app.route('/')
 def index():
